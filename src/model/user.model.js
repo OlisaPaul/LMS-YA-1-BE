@@ -77,7 +77,7 @@ function validate(user) {
     password: Joi.string().min(5).max(1024).required(),
     email: Joi.string().email().min(5).max(255).required(),
     username: Joi.string().min(4).max(255).required(),
-    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3'),
+    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3').insensitive(),
   });
 
   return schema.validate(user);
@@ -89,7 +89,7 @@ function validatePatch(user) {
     lastName: Joi.string().min(4).max(255),
     password: Joi.string().min(5).max(1024),
     email: Joi.string().email().min(5).max(255),
-    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3'),
+    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3').insensitive(),
   });
 
   return schema.validate(user);
