@@ -11,7 +11,7 @@ router.post("/", validateMiddleware(validate), authController.logIn);
 function validate(req) {
   const schema = Joi.object({
     password: Joi.string().min(5).max(1024).required(),
-    email: Joi.string().email().min(5).max(255).required(),
+    username: Joi.string().min(5).max(255).required(),
   });
 
   return schema.validate(req);

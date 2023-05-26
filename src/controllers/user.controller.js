@@ -7,6 +7,7 @@ const {
   errorMessage,
   successMessage,
   unAuthMessage,
+  errorMessageUserName,
 } = require("../common/messages.common");
 const generateRandomAvatar = require("../utils/generateRandomAvatar.utils");
 
@@ -87,7 +88,7 @@ class UserController {
     if (user) {
       res.send(successMessage(MESSAGES.FETCHED, user));
     } else {
-      res.status(404).send(errorMessage(user, "user"));
+      res.status(404).send(errorMessageUserName());
     }
   }
 

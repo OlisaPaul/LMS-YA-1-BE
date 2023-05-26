@@ -8,6 +8,13 @@ const errorMessage = (data, resource, resourceId = resource) => {
   };
 };
 
+const errorMessageUserName = () => {
+  return {
+    message: "We can't find user with the given username",
+    success: false,
+  };
+};
+
 const successMessage = (message, data) => {
   return { message, success: true, data };
 };
@@ -25,6 +32,7 @@ const loginSuccess = (data) => {
 };
 
 exports.errorMessage = errorMessage;
+exports.errorMessageUserName = errorMessageUserName;
 exports.successMessage = successMessage;
 exports.unAuthMessage = unAuthMessage;
 exports.loginError = loginError;
