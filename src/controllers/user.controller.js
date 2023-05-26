@@ -5,6 +5,7 @@ const { MESSAGES } = require("../common/constants.common");
 
 const {
   errorMessage,
+  errorMessageUserName,
   successMessage,
   unAuthMessage,
 } = require("../common/messages.common");
@@ -31,16 +32,19 @@ class UserController {
         message: "Username has been taken, please use another one",
       });
 
-    user = new User(
-      _.pick(req.body, [
-        "firstName",
-        "lastName",
-        "password",
-        "email",
-        "username",
-        "learningTrack",
-      ])
-    );
+    user = _.pick(req.body, [
+      "firstName",
+      "lastName",
+      "password",
+      "email",
+      "username",
+      "learningTrack",
+    ])
+
+    user.learningTrack = user.learningTrack.toLowerCase()
+
+    user = new User(user);
+
 
     const avatarUrl = await generateRandomAvatar(user.email);
     user.avatarUrl = avatarUrl;
@@ -59,6 +63,7 @@ class UserController {
       "lastName",
       "email",
       "username",
+      "learningTrack",
       "avatarUrl",
       "avatarImgTag",
     ]);
@@ -87,7 +92,7 @@ class UserController {
     if (user) {
       res.send(successMessage(MESSAGES.FETCHED, user));
     } else {
-      res.status(404).send(errorMessage(user, "user"));
+      res.status(404).send(errorMessageUserName());
     }
   }
 
