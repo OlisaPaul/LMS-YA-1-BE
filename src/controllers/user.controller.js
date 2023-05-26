@@ -60,6 +60,7 @@ class UserController {
       "lastName",
       "email",
       "username",
+      "learningTrack",
       "avatarUrl",
       "avatarImgTag",
     ]);
