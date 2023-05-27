@@ -1,6 +1,6 @@
 const validateMiddleware = require("../middleware/validate.middleware");
 const _ = require("lodash");
-const { validate, validatePatch } = require("../model/testUser.model");
+const { validate} = require("../model/testUser.model");
 const express = require("express");
 const router = express.Router();
 const asyncMiddleware = require("../middleware/async.middleware");
