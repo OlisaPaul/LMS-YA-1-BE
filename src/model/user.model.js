@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  username: {
+  userName: {
     type: String,
     required: true,
   },
@@ -76,8 +76,8 @@ function validate(user) {
     lastName: Joi.string().min(4).max(255).required(),
     password: Joi.string().min(5).max(1024).required(),
     email: Joi.string().email().min(5).max(255).required(),
-    username: Joi.string().min(4).max(255).required(),
-    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3'),
+    userName: Joi.string().min(4).max(255).required(),
+    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3').insensitive(),
   });
 
   return schema.validate(user);
@@ -88,8 +88,9 @@ function validatePatch(user) {
     firstName: Joi.string().min(4).max(255),
     lastName: Joi.string().min(4).max(255),
     password: Joi.string().min(5).max(1024),
+    userName: Joi.string().min(4).max(255).required(),
     email: Joi.string().email().min(5).max(255),
-    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3'),
+    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3').insensitive(),
   });
 
   return schema.validate(user);
