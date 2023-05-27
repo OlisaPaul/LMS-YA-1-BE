@@ -20,7 +20,7 @@ router.post(
 router.get("/", asyncMiddleware(userController.fetchAllUsers));
 
 router.get(
-  "/username/:username",
+  "/userName/:userName",
   asyncMiddleware(userController.getUserByUsername)
 );
 
