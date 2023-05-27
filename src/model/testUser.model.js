@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 require("dotenv").config();
 
-const userSchema = new mongoose.Schema({
+const testUserSchema = new mongoose.Schema({
   firstName: {
     type: String,
     minlength: 4,
@@ -34,35 +34,16 @@ const userSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
-  isAdmin: Boolean,
-  isDeleted: Boolean,
-  avatarUrl: {
-    type: String,
-    required: true,
-  },
-  avatarImgTag: {
-    type: String,
-    required: true,
-  },
-  userName: {
-    type: String,
-    required: true,
-  },
   learningTrack: {
-    type: String,
-    required: true,
-  },
-  eth: {
     type: String,
     required: true,
   },
 });
 
-userSchema.methods.generateAuthToken = function () {
+testUserSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     {
       _id: this._id,
-      isAdmin: this.isAdmin,
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
@@ -74,36 +55,20 @@ userSchema.methods.generateAuthToken = function () {
   return token;
 };
 
-const User = mongoose.model("User", userSchema);
+const TestUser = mongoose.model("TestUser", testUserSchema);
 
-function validate(user) {
+function validate(testUser) {
   const schema = Joi.object({
     firstName: Joi.string().min(4).max(255).required(),
     lastName: Joi.string().min(4).max(255).required(),
     password: Joi.string().min(5).max(1024).required(),
     email: Joi.string().email().min(5).max(255).required(),
-    userName: Joi.string().min(4).max(255).required(),
-    eth: Joi.string().min(4).max(255).required(),
     learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3').insensitive(),
   });
 
-  return schema.validate(user);
+  return schema.validate(testUser);
 }
 
-function validatePatch(user) {
-  const schema = Joi.object({
-    firstName: Joi.string().min(4).max(255),
-    lastName: Joi.string().min(4).max(255),
-    password: Joi.string().min(5).max(1024),
-    userName: Joi.string().min(4).max(255).required(),
-    eth: Joi.string().min(4).max(255).required(),
-    email: Joi.string().email().min(5).max(255),
-    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3').insensitive(),
-  });
 
-  return schema.validate(user);
-}
-
-exports.validatePatch = validatePatch;
 exports.validate = validate;
-exports.User = User;
+exports.TestUser = TestUser;
