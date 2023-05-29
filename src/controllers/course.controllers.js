@@ -4,13 +4,7 @@ const { User } = require("../model/user.model");
 const courseService = require("../services/course.service");
 const { MESSAGES } = require("../common/constants.common");
 
-const {
-  errorMessage,
-  successMessage,
-  unAuthMessage,
-} = require("../common/messages.common");
-const generateRandomAvatar = require("../utils/generateRandomAvatar.utils");
-const { User } = require("../model/user.model");
+const { errorMessage, successMessage } = require("../common/messages.common");
 const userService = require("../services/user.service");
 
 class CourseController {

@@ -26,14 +26,16 @@ const Course = mongoose.model("Course", courseSchema);
 
 function validate(course) {
   const schema = Joi.object({
-    userId: Joi.string().required(),
+    userId: Joi.objectId().required(),
     courseContent: Joi.string().min(4).max(255).required(),
     learningTrack: Joi.array()
-      .min(4)
-      .max(255)
-      .required()
-      .valid("backend", "frontend", "product design", "web3")
-      .insensitive(),
+      .items(
+        Joi.string()
+          .valid("backend", "frontend", "product design", "web3")
+          .insensitive()
+      )
+      .min(1)
+      .required(),
   });
 
   return schema.validate(course);
@@ -44,10 +46,13 @@ function validatePatch(course) {
     userId: Joi.string(),
     courseContent: Joi.string().min(4).max(255),
     learningTrack: Joi.array()
-      .min(4)
-      .max(255)
-      .valid("backend", "frontend", "product design", "web3")
-      .insensitive(),
+      .items(
+        Joi.string()
+          .valid("backend", "frontend", "product design", "web3")
+          .insensitive()
+      )
+      .min(1)
+      .required(),
   });
 
   return schema.validate(course);
