@@ -42,6 +42,7 @@ class UserController {
         "email",
         "userName",
         "eth",
+        "role",
         "learningTrack",
       ])
     );
@@ -57,6 +58,9 @@ class UserController {
 
     user.userName = `@${req.body.userName}`;
 
+    user.learningTrack = user.learningTrack.toLowerCase();
+    user.role = user.role.toLowerCase();
+
     user = await userService.createUser(user);
 
     // it creates a token which is sent as an header to the client
@@ -70,6 +74,7 @@ class UserController {
       "userName",
       "learningTrack",
       "eth",
+      "role",
       "avatarUrl",
       "avatarImgTag",
     ]);
