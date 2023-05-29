@@ -40,6 +40,7 @@ class UserController {
         "email",
         "userName",
         "eth",
+        "role",
         "learningTrack",
       ])
     );
@@ -63,6 +64,7 @@ class UserController {
       "userName",
       "learningTrack",
       "eth",
+      "role",
       "avatarUrl",
       "avatarImgTag",
     ]);

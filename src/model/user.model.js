@@ -52,6 +52,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    required: true,
+  },
   eth: {
     type: String,
     required: true,
@@ -66,8 +70,9 @@ userSchema.methods.generateAuthToken = function () {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
+      role: this.role,
       avatarUrl: this.avatarUrl,
-      learningTrack: this.learningTrack
+      learningTrack: this.learningTrack,
     },
     process.env.jwtPrivateKey
   );
@@ -84,7 +89,18 @@ function validate(user) {
     email: Joi.string().email().min(5).max(255).required(),
     userName: Joi.string().min(4).max(255).required(),
     eth: Joi.string().min(4).max(255).required(),
-    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3').insensitive(),
+    learningTrack: Joi.string()
+      .min(4)
+      .max(255)
+      .required()
+      .valid("backend", "frontend", "product design", "web3")
+      .insensitive(),
+    role: Joi.string()
+      .min(4)
+      .max(255)
+      .required()
+      .valid("student", "educator")
+      .insensitive(),
   });
 
   return schema.validate(user);
@@ -98,7 +114,18 @@ function validatePatch(user) {
     userName: Joi.string().min(4).max(255).required(),
     eth: Joi.string().min(4).max(255).required(),
     email: Joi.string().email().min(5).max(255),
-    learningTrack: Joi.string().min(4).max(255).required().valid('backend', 'frontend', 'product design', 'web3').insensitive(),
+    learningTrack: Joi.string()
+      .min(4)
+      .max(255)
+      .required()
+      .valid("backend", "frontend", "product design", "web3")
+      .insensitive(),
+    role: Joi.string()
+      .min(4)
+      .max(255)
+      .required()
+      .valid("student", "educator")
+      .insensitive(),
   });
 
   return schema.validate(user);
