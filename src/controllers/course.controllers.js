@@ -40,10 +40,10 @@ class CourseController {
   }
 
   async getCourseByUserId(req, res) {
-    const user = await userService.getUserById(req.body.userId);
+    const user = await userService.getUserById(req.params.userId);
     if (!user) return errorMessage(user, "user");
 
-    const course = await courseService.getCourseById(req.params.userId);
+    const course = await courseService.getCourseByUserId(req.params.userId);
 
     if (course) {
       res.send(successMessage(MESSAGES.FETCHED, course));
