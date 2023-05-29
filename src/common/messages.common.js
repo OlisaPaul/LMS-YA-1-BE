@@ -10,11 +10,11 @@ const errorMessage = (data, resource, resourceId = resource) => {
 
 const errorMessageUserName = () => {
   return {
-    message: "We can't find user with the given username",
+
+    message: "We can't find user with the given userName",
     success: false,
   };
 };
-
 
 const successMessage = (message, data) => {
   return { message, success: true, data };

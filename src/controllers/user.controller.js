@@ -8,6 +8,7 @@ const {
   errorMessageUserName,
   successMessage,
   unAuthMessage,
+  errorMessageUserName,
 } = require("../common/messages.common");
 const generateRandomAvatar = require("../utils/generateRandomAvatar.utils");
 
@@ -25,21 +26,25 @@ class UserController {
         .status(400)
         .send({ success: false, message: "User already registered" });
 
-    const username = await User.findOne({ username: `@${req.body.username}` });
-    if (username)
+    const userName = await User.findOne({ userName: `@${req.body.userName}` });
+    if (userName)
       return res.status(400).send({
         success: false,
         message: "Username has been taken, please use another one",
       });
 
-    user = _.pick(req.body, [
-      "firstName",
-      "lastName",
-      "password",
-      "email",
-      "username",
-      "learningTrack",
-    ])
+
+    user = new User(
+      _.pick(req.body, [
+        "firstName",
+        "lastName",
+        "password",
+        "email",
+        "userName",
+        "eth",
+        "learningTrack",
+      ])
+    );
 
     user.learningTrack = user.learningTrack.toLowerCase()
 
@@ -50,7 +55,7 @@ class UserController {
     user.avatarUrl = avatarUrl;
     user.avatarImgTag = `<img src=${avatarUrl} alt=${user._id}>`;
 
-    user.username = `@${req.body.username}`;
+    user.userName = `@${req.body.userName}`;
 
     user = await userService.createUser(user);
 
@@ -62,8 +67,9 @@ class UserController {
       "firstName",
       "lastName",
       "email",
-      "username",
+      "userName",
       "learningTrack",
+      "eth",
       "avatarUrl",
       "avatarImgTag",
     ]);
@@ -87,7 +93,7 @@ class UserController {
   }
 
   async getUserByUsername(req, res) {
-    const user = await userService.getUserByUsername(req.params.username);
+    const user = await userService.getUserByUsername(req.params.userName);
 
     if (user) {
       res.send(successMessage(MESSAGES.FETCHED, user));

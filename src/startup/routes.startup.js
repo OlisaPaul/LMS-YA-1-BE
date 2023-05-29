@@ -4,6 +4,7 @@ const cors = require('cors');
 const error = require("../middleware/error.middleware");
 const auth = require("../routes/auth.routes");
 const users = require("../routes/users.routes");
+const testUsers = require("../routes/testUsers.routes");
 
 module.exports = function (app) {
   app.use(cors());
@@ -13,6 +14,7 @@ module.exports = function (app) {
   // if the api is {{baseUrl}}/api/v1/posts, it uses the posts method in the router object
 
   app.use("/api/v1/users", users);
+  app.use("/api/v1/testUsers", testUsers);
   app.use("/api/v1/auth", auth);
 
   // it calls the error middleware if there was a rejected promise.
