@@ -10,6 +10,7 @@ const errorMessage = (data, resource, resourceId = resource) => {
 
 const errorMessageUserName = () => {
   return {
+
     message: "We can't find user with the given userName",
     success: false,
   };
