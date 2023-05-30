@@ -20,7 +20,7 @@ module.exports = function (app) {
   app.use("/api/v1/auth", auth);
   app.use("/api/v1/courses", courses);
   app.use("/api/v1/tasks", tasks);
-  app.use("/api/v1/tasks", submissions);
+  app.use("/api/v1/submissions", submissions);
   app.use("/api/v1/testUsers", testUsers);
 
   // it calls the error middleware if there was a rejected promise.

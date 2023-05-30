@@ -8,12 +8,13 @@ const router = express.Router();
 const asyncMiddleware = require("../middleware/async.middleware");
 const validateObjectId = require("../middleware/validateObjectId.middleware");
 const submissionController = require("../controllers/submission.controller");
+const studentMiddleware = require("../middleware/student.middleware");
 
 // This is used for registering a new submission.
 router.post(
   "/",
   auth,
-  educator,
+  studentMiddleware,
   validateMiddleware(validate),
   asyncMiddleware(submissionController.addNewSubmission)
 );
