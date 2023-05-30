@@ -40,6 +40,7 @@ class UserController {
         "email",
         "userName",
         "eth",
+        "role",
         "learningTrack",
       ])
     );
@@ -49,6 +50,9 @@ class UserController {
     user.avatarImgTag = `<img src=${avatarUrl} alt=${user._id}>`;
 
     user.userName = `@${req.body.userName}`;
+
+    user.learningTrack = user.learningTrack.toLowerCase();
+    user.role = user.role.toLowerCase();
 
     user = await userService.createUser(user);
 
@@ -63,6 +67,7 @@ class UserController {
       "userName",
       "learningTrack",
       "eth",
+      "role",
       "avatarUrl",
       "avatarImgTag",
     ]);
