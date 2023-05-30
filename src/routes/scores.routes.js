@@ -14,7 +14,7 @@ const studentMiddleware = require("../middleware/student.middleware");
 router.post(
   "/",
   auth,
-  studentMiddleware,
+  educator,
   validateMiddleware(validate),
   asyncMiddleware(scoreController.addNewScore)
 );
