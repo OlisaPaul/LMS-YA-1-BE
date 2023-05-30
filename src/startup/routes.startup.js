@@ -7,6 +7,7 @@ const users = require("../routes/users.routes");
 const courses = require("../routes/courses.routes");
 const tasks = require("../routes/tasks.routes");
 const submissions = require("../routes/submissions.routes");
+const scores = require("../routes/scores.routes");
 const testUsers = require("../routes/testUsers.routes");
 
 module.exports = function (app) {
@@ -21,6 +22,7 @@ module.exports = function (app) {
   app.use("/api/v1/courses", courses);
   app.use("/api/v1/tasks", tasks);
   app.use("/api/v1/submissions", submissions);
+  app.use("/api/v1/scores", scores);
   app.use("/api/v1/testUsers", testUsers);
 
   // it calls the error middleware if there was a rejected promise.
