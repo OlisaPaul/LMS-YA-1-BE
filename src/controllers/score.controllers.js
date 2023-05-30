@@ -2,7 +2,7 @@ const _ = require("lodash");
 const { Score } = require("../model/score.model");
 const { Task } = require("../model/task.model");
 const { User } = require("../model/user.model");
-const scoreService = require("../services/score.service");
+const scoreService = require("../services/score.services");
 const { MESSAGES } = require("../common/constants.common");
 const { errorMessage, successMessage } = require("../common/messages.common");
 const userService = require("../services/user.service");
@@ -12,18 +12,18 @@ class ScoreController {
     res.status(200).send({ message: MESSAGES.DEFAULT, success: true });
   }
 
-  //Create a new user
+  //Create a new score
   async addNewScore(req, res) {
-    // Checks if a user already exist by using the email id
-    const user = await User.findById(req.body.userId);
+    // Checks if a score already exist by using the email id
+    const student = await User.findById(req.body.studentId);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
+    if (!student) return res.status(404).send(errorMessage(student, "student"));
 
     const task = await Task.findById(req.body.taskId);
 
     if (!task) return res.status(404).send(errorMessage(task, "task"));
 
-    let score = new Score(_.pick(req.body, ["userId", "taskId", "score"]));
+    let score = new Score(_.pick(req.body, ["studentId", "taskId", "score"]));
 
     score = await scoreService.createScore(score);
 
@@ -41,11 +41,11 @@ class ScoreController {
     }
   }
 
-  async getScoreByUserId(req, res) {
-    const user = await userService.getUserById(req.params.userId);
-    if (!user) return errorMessage(user, "user");
+  async getScoreByStudentId(req, res) {
+    const student = await userService.getUserById(req.params.studentId);
+    if (!student) return errorMessage(student, "student");
 
-    const score = await scoreService.getScoreByUserId(req.params.userId);
+    const score = await scoreService.getScoreByUserId(req.params.studentId);
 
     if (score) {
       res.send(successMessage(MESSAGES.FETCHED, score));

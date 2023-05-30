@@ -14,7 +14,7 @@ const scoreSchema = new mongoose.Schema({
     ref: "Task",
     required: true,
   },
-  userId: {
+  studentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -27,7 +27,7 @@ const Score = mongoose.model("Score", scoreSchema);
 function validate(score) {
   const schema = Joi.object({
     taskId: Joi.objectId().required(),
-    userId: Joi.objectId().required(),
+    studentId: Joi.objectId().required(),
     score: Joi.number().min(0).max(100).required(),
   });
 
@@ -37,7 +37,7 @@ function validate(score) {
 function validatePatch(score) {
   const schema = Joi.object({
     taskId: Joi.objectId(),
-    userId: Joi.objectId(),
+    studentId: Joi.objectId(),
     score: Joi.number().min(0).max(100),
   });
 

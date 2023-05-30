@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const { User } = require("../model/user.model");
+const { Score } = require("../model/score.model");
 const userService = require("../services/user.service");
 const { MESSAGES } = require("../common/constants.common");
 
@@ -98,6 +99,66 @@ class UserController {
     } else {
       res.status(404).send(errorMessageUserName());
     }
+  }
+
+  async getTotalScoresPerUser(req, res) {
+    const scores = await Score.aggregate([
+      // Group scores by student
+      {
+        $group: {
+          _id: "$studentId",
+          totalScore: { $sum: "$score" },
+          tasks: { $addToSet: "$taskId" },
+        },
+      },
+      // Populate student details
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "student",
+        },
+      },
+      // Populate task details
+      {
+        $lookup: {
+          from: "tasks",
+          localField: "tasks",
+          foreignField: "_id",
+          as: "taskDetails",
+        },
+      },
+      // Project desired fields
+      {
+        $project: {
+          _id: 0,
+          student: {
+            firstName: { $arrayElemAt: ["$student.firstName", 0] },
+            lastName: { $arrayElemAt: ["$student.lastName", 0] },
+            learningTrack: { $arrayElemAt: ["$student.learningTrack", 0] },
+          },
+          tasks: "$taskDetails.description",
+          totalScore: 1,
+        },
+      },
+    ]);
+
+    res.json(scores);
+  }
+
+  //get all educators in the user collection/table
+  async fetchAllEducators(req, res) {
+    const users = await userService.getAllEducators();
+
+    res.send(successMessage(MESSAGES.FETCHED, users));
+  }
+
+  //get all students in the user collection/table
+  async fetchAllStudents(req, res) {
+    const users = await userService.getAllStudents();
+
+    res.send(successMessage(MESSAGES.FETCHED, users));
   }
 
   //get all users in the user collection/table

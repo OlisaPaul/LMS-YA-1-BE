@@ -27,6 +27,18 @@ class UserService {
     return await User.find({ isDeleted: undefined }).sort({ _id: -1 });
   }
 
+  async getAllEducators() {
+    return await User.find({ role: "educator", isDeleted: undefined }).sort({
+      _id: -1,
+    });
+  }
+
+  async getAllStudents() {
+    return await User.find({ role: "student", isDeleted: undefined }).sort({
+      _id: -1,
+    });
+  }
+
   async updateUserById(id, user) {
     return await User.findByIdAndUpdate(
       id,

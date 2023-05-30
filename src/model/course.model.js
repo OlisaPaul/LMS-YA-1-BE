@@ -10,7 +10,7 @@ const courseSchema = new mongoose.Schema({
     trim: true,
     required: true,
   },
-  userId: {
+  educatorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -26,7 +26,7 @@ const Course = mongoose.model("Course", courseSchema);
 
 function validate(course) {
   const schema = Joi.object({
-    userId: Joi.objectId().required(),
+    educatorId: Joi.objectId().required(),
     courseContent: Joi.string().min(4).max(255).required(),
     learningTrack: Joi.array()
       .items(
@@ -43,7 +43,7 @@ function validate(course) {
 
 function validatePatch(course) {
   const schema = Joi.object({
-    userId: Joi.string(),
+    educatorId: Joi.string(),
     courseContent: Joi.string().min(4).max(255),
     learningTrack: Joi.array()
       .items(

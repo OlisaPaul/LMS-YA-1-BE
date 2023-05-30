@@ -12,32 +12,32 @@ class SubmissionService {
       _id: submissionId,
       isDeleted: undefined,
     })
-      .populate("userId")
+      .populate("studentId")
       .populate("taskId");
   }
 
   async getSubmissionByTaskId(taskId) {
     return await Submission.findOne({ taskId, isDeleted: undefined })
-      .populate("userId")
+      .populate("studentId")
       .populate("taskId");
   }
 
-  async getSubmissionByUserId(userId) {
-    return await Submission.findOne({ userId, isDeleted: undefined })
-      .populate("userId")
+  async getSubmissionByUserId(studentId) {
+    return await Submission.findOne({ studentId, isDeleted: undefined })
+      .populate("studentId")
       .populate("taskId");
   }
 
-  async getSubmissionByTaskIdAndUserId(taskId, userId) {
-    return await Submission.findOne({ taskId, userId, isDeleted: undefined })
-      .populate("userId")
+  async getSubmissionByTaskIdAndUserId(taskId, studentId) {
+    return await Submission.findOne({ taskId, studentId, isDeleted: undefined })
+      .populate("studentId")
       .populate("taskId");
   }
 
   async getAllSubmissions() {
     return await Submission.find({ isDeleted: undefined })
       .sort({ _id: -1 })
-      .populate("userId")
+      .populate("studentId")
       .populate("taskId");
   }
 
