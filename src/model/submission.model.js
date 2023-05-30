@@ -15,7 +15,7 @@ const submissionSchema = new mongoose.Schema({
     ref: "Task",
     required: true,
   },
-  userId: {
+  studentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -32,7 +32,7 @@ const Submission = mongoose.model("Submission", submissionSchema);
 function validate(submission) {
   const schema = Joi.object({
     taskId: Joi.objectId().required(),
-    userId: Joi.objectId().required(),
+    studentId: Joi.objectId().required(),
     description: Joi.string().min(4).max(255).required(),
     dateSubmitted: Joi.date().iso().required(),
     link: Joi.string().required(),
@@ -44,7 +44,7 @@ function validate(submission) {
 function validatePatch(submission) {
   const schema = Joi.object({
     taskId: Joi.objectId().required(),
-    userId: Joi.objectId().required(),
+    studentId: Joi.objectId().required(),
     description: Joi.string().min(4).max(255).required(),
     dateSubmitted: Joi.date().iso().required(),
     link: Joi.string().required(),

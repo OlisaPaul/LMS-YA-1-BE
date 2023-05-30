@@ -19,6 +19,12 @@ router.post(
 
 router.get("/", asyncMiddleware(userController.fetchAllUsers));
 
+router.get("/students", asyncMiddleware(userController.fetchAllStudents));
+
+router.get("/educators", asyncMiddleware(userController.fetchAllEducators));
+
+router.get("/scores", asyncMiddleware(userController.getTotalScoresPerUser));
+
 router.get(
   "/userName/:userName",
   asyncMiddleware(userController.getUserByUsername)

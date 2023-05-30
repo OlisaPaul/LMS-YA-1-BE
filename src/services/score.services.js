@@ -12,32 +12,32 @@ class ScoreService {
       _id: scoreId,
       isDeleted: undefined,
     })
-      .populate("userId")
+      .populate("studentId")
       .populate("taskId");
   }
 
   async getScoreByTaskId(taskId) {
     return await Score.findOne({ taskId, isDeleted: undefined })
-      .populate("userId")
+      .populate("studentId")
       .populate("taskId");
   }
 
-  async getScoreByUserId(userId) {
-    return await Score.findOne({ userId, isDeleted: undefined })
-      .populate("userId")
+  async getScoreByUserId(studentId) {
+    return await Score.findOne({ studentId, isDeleted: undefined })
+      .populate("studentId")
       .populate("taskId");
   }
 
-  async getScoreByTaskIdAndUserId(taskId, userId) {
-    return await Score.findOne({ taskId, userId, isDeleted: undefined })
-      .populate("userId")
+  async getScoreByTaskIdAndUserId(taskId, studentId) {
+    return await Score.findOne({ taskId, studentId, isDeleted: undefined })
+      .populate("studentId")
       .populate("taskId");
   }
 
   async getAllScores() {
     return await Score.find({ isDeleted: undefined })
       .sort({ _id: -1 })
-      .populate("userId")
+      .populate("studentId")
       .populate("taskId");
   }
 

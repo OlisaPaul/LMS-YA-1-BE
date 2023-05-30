@@ -12,19 +12,19 @@ class SubmissionController {
     res.status(200).send({ message: MESSAGES.DEFAULT, success: true });
   }
 
-  //Create a new user
+  //Create a new subission
   async addNewSubmission(req, res) {
-    // Checks if a user already exist by using the email id
-    const user = await User.findById(req.body.userId);
+    // Checks if a submission exist
+    const student = await User.findById(req.body.studentId);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
+    if (!student) return res.status(404).send(errorMessage(student, "student"));
 
     const task = await Task.findById(req.body.taskId);
 
     if (!task) return res.status(404).send(errorMessage(task, "task"));
 
     let submission = new Submission(
-      _.pick(req.body, ["userId", "taskId", "link", "dateSubmitted"])
+      _.pick(req.body, ["studentId", "taskId", "link", "dateSubmitted"])
     );
 
     submission = await submissionService.createSubmission(submission);
@@ -44,11 +44,11 @@ class SubmissionController {
   }
 
   async getSubmissionByUserId(req, res) {
-    const user = await userService.getUserById(req.params.userId);
-    if (!user) return errorMessage(user, "user");
+    const student = await userService.getUserById(req.params.studentId);
+    if (!student) return errorMessage(student, "student");
 
     const submission = await submissionService.getSubmissionByUserId(
-      req.params.userId
+      req.params.studentId
     );
 
     if (submission) {

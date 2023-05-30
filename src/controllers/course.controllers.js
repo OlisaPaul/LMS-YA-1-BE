@@ -12,15 +12,15 @@ class CourseController {
     res.status(200).send({ message: MESSAGES.DEFAULT, success: true });
   }
 
-  //Create a new user
+  //Create a new course
   async addNewCourse(req, res) {
-    // Checks if a user already exist by using the email id
-    const user = await User.findById(req.body.userId);
+    const educator = await User.findById(req.body.educatorId);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
+    if (!educator)
+      return res.status(404).send(errorMessage(educator, "educator"));
 
     let course = new Course(
-      _.pick(req.body, ["userId", "courseContent", "learningTrack"])
+      _.pick(req.body, ["educatorId", "courseContent", "learningTrack"])
     );
 
     course = await courseService.createCourse(course);
@@ -40,10 +40,10 @@ class CourseController {
   }
 
   async getCourseByUserId(req, res) {
-    const user = await userService.getUserById(req.params.userId);
-    if (!user) return errorMessage(user, "user");
+    const educator = await userService.getUserById(req.params.educatorId);
+    if (!educator) return errorMessage(educator, "educator");
 
-    const course = await courseService.getCourseByUserId(req.params.userId);
+    const course = await courseService.getCourseByUserId(req.params.educatorId);
 
     if (course) {
       res.send(successMessage(MESSAGES.FETCHED, course));
