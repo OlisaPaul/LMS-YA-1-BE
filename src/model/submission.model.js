@@ -35,6 +35,7 @@ function validate(submission) {
     userId: Joi.objectId().required(),
     description: Joi.string().min(4).max(255).required(),
     dateSubmitted: Joi.date().iso().required(),
+    link: Joi.string().required(),
   });
 
   return schema.validate(submission);
@@ -46,6 +47,7 @@ function validatePatch(submission) {
     userId: Joi.objectId().required(),
     description: Joi.string().min(4).max(255).required(),
     dateSubmitted: Joi.date().iso().required(),
+    link: Joi.string().required(),
   });
 
   return schema.validate(submission);
