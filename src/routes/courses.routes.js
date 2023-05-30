@@ -1,5 +1,5 @@
 const validateMiddleware = require("../middleware/validate.middleware");
-const educator = require("../middleware/educator.middleware");
+const educator = reqauire("../middleware/educator.middleware");
 const auth = require("../middleware/auth.middleware");
 const admin = require("../middleware/admin.middleware");
 const { validate, validatePatch } = require("../model/course.model");
