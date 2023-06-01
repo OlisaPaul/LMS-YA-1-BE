@@ -8,7 +8,7 @@ const express = require("express");
 const router = express.Router();
 const asyncMiddleware = require("../middleware/async.middleware");
 const validateObjectId = require("../middleware/validateObjectId.middleware");
-const userController = require("../controllers/user.controller");
+const userController = require("../controllers/user.controllers");
 
 // This is used for registering a new user.
 router.post(
@@ -19,9 +19,10 @@ router.post(
 
 router.get("/", asyncMiddleware(userController.fetchAllUsers));
 
-router.get("/students", asyncMiddleware(userController.fetchAllStudents));
-
-router.get("/educators", asyncMiddleware(userController.fetchAllEducators));
+router.get(
+  "/learningTrack/:learningTrack",
+  asyncMiddleware(userController.fetchUserByLearningTrack)
+);
 
 router.get("/scores", asyncMiddleware(userController.getTotalScoresPerUser));
 
