@@ -14,7 +14,7 @@ const studentMiddleware = require("../middleware/student.middleware");
 router.post(
   "/",
   auth,
-  educator,
+  admin,
   validateMiddleware(validate),
   asyncMiddleware(scoreController.addNewScore)
 );
@@ -38,6 +38,7 @@ router.put(
   validateObjectId,
   // auth is used to make authenticate a score.
   auth,
+  admin,
   validateMiddleware(validatePatch),
   asyncMiddleware(scoreController.updateScoreById)
 );
