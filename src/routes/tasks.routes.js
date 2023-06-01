@@ -13,7 +13,7 @@ const taskController = require("../controllers/task.controllers");
 router.post(
   "/",
   auth,
-  educator,
+  admin,
   validateMiddleware(validate),
   asyncMiddleware(taskController.addNewTask)
 );
