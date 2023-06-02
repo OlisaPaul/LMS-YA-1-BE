@@ -19,6 +19,8 @@ router.post(
 
 router.get("/", asyncMiddleware(userController.fetchAllUsers));
 
+router.get("/students", asyncMiddleware(userController.fetchAllStudents));
+
 router.get(
   "/learningTrack/:learningTrack",
   asyncMiddleware(userController.fetchUserByLearningTrack)
