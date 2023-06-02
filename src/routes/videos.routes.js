@@ -1,32 +1,38 @@
-const { Video } = require("../model/video.model");
-const cloudinary = require("cloudinary").v2;
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
-// Configure Cloudinary credentials
+const admin = require("../middleware/admin.middleware");
+const auth = require("../middleware/auth.middleware");
+const videoController = require("../controllers/video.controllers");
+const asyncMiddleware = require("../middleware/async.middleware");
+const validateMiddleware = require("../middleware/validate.middleware");
+const { validate } = require("../model/video.model");
+const validateObjectId = require("../middleware/validateObjectId.middleware");
 
-router.post("/", upload.single("video"));
+router.post(
+  "/",
+  auth,
+  admin,
+  validateMiddleware(validate),
+  upload.single("video"),
+  videoController.uploadVideo
+);
 
-router.get("/", async (req, res) => {
-  try {
-    const videos = await Video.find();
+router.get("/", asyncMiddleware(videoController.getAllVideos));
 
-    // Add the Cloudinary URL to each video object
-    const videosWithUrls = videos.map((video) => {
-      return {
-        _id: video._id,
-        title: video.title,
-        description: video.description,
-        videoUrl: video.videoUrl,
-      };
-    });
+router.get(
+  "/:id",
+  validateObjectId,
+  asyncMiddleware(videoController.getVideoById)
+);
 
-    res.json(videosWithUrls);
-  } catch (error) {
-    console.error("Error retrieving videos:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+router.delete(
+  "/:id",
+  validateObjectId,
+  auth,
+  admin,
+  asyncMiddleware(videoController.deleteVideo)
+);
 
 module.exports = router;

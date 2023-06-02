@@ -11,13 +11,11 @@ class VideoService {
     return await Video.findOne({
       _id: videoId,
       isDeleted: undefined,
-    }).populate("courseId");
+    });
   }
 
   async getAllVideos() {
-    return await Video.find({ isDeleted: undefined })
-      .sort({ _id: -1 })
-      .populate("courseId");
+    return await Video.find();
   }
 
   async updateVideoById(id, video) {

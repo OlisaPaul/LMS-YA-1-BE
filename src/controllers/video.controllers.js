@@ -1,7 +1,9 @@
-const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
-const {Video} = require("../model/video.model")
+const { Video } = require("../model/video.model");
 const videoService = require("../services/video.services");
+const { MESSAGES } = require("../common/constants.common");
+const videoServices = require("../services/video.services");
+const { successMessage, errorMessage } = require("../common/messages.common");
 
 // Configure Cloudinary credentials
 cloudinary.config({
@@ -11,6 +13,10 @@ cloudinary.config({
 });
 
 class VideoController {
+  async getStatus(req, res) {
+    res.status(200).send({ message: MESSAGES.DEFAULT, success: true });
+  }
+
   async uploadVideo(req, res) {
     try {
       const { title, description } = req.body;
@@ -25,17 +31,51 @@ class VideoController {
       const videoUrl = uploadedVideo.secure_url;
 
       const video = new Video({ title, description, videoUrl });
-      
+
       await videoService.createVideo(video);
 
-      res.status(201).json(video);
+      res.send(successMessage(MESSAGES.CREATED, video));
     } catch (error) {
       console.error("Error uploading video:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
 
-  async getAllVideos()
+  async getAllVideos(req, res) {
+    const videos = await videoServices.getAllVideos();
 
+    // Add the Cloudinary URL to each video object
+    const videosWithUrls = videos.map((video) => {
+      return {
+        _id: video._id,
+        title: video.title,
+        description: video.description,
+        videoUrl: video.videoUrl,
+      };
+    });
+
+    res.json(videosWithUrls);
+  }
+
+  async getVideoById(req, res) {
+    const video = await videoServices.getVideoById(req.params.id);
+
+    if (video) {
+      res.send(successMessage(MESSAGES.FETCHED, video));
+    } else {
+      res.status(404).send(errorMessage(video, "video"));
+    }
+  }
+
+  async deleteVideo(req, res) {
+    const video = await videoService.getVideoById(req.params.id);
+
+    if (!video) return res.status(404).send(errorMessage(video, "video"));
+
+    await videoService.deleteVideo(req.params.id);
+
+    res.send(successMessage(MESSAGES.DELETED, video));
+  }
 }
 
+module.exports = new VideoController();
