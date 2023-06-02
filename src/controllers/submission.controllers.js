@@ -1,11 +1,11 @@
 const _ = require("lodash");
 const { Submission } = require("../model/submission.model");
-const { Task } = require("../model/task.model");
-const { User } = require("../model/user.model");
-const submissionService = require("../services/submission.services");
 const { MESSAGES } = require("../common/constants.common");
 const { errorMessage, successMessage } = require("../common/messages.common");
-const userService = require("../services/user.service");
+const userService = require("../services/user.services");
+const submissionService = require("../services/submission.services");
+const taskService = require("../services/task.services");
+const courseService = require("../services/course.services");
 
 class SubmissionController {
   async getStatus(req, res) {
@@ -15,13 +15,23 @@ class SubmissionController {
   //Create a new subission
   async addNewSubmission(req, res) {
     // Checks if a submission exist
-    const student = await User.findById(req.body.studentId);
+    const student = await userService.getUserById(req.body.studentId);
 
     if (!student) return res.status(404).send(errorMessage(student, "student"));
 
-    const task = await Task.findById(req.body.taskId);
+    const task = await taskService.getTaskById(req.body.taskId);
 
     if (!task) return res.status(404).send(errorMessage(task, "task"));
+
+    //makes sure a user cannot submit links for a different learning Track
+
+    const course = await courseService.getCourseById(task.courseId);
+
+    if (!course.learningTrack.includes(student.learningTrack))
+      return res.status(400).send({
+        success: false,
+        message: "You can not submit for a different learning track",
+      });
 
     let submission = new Submission(
       _.pick(req.body, ["studentId", "taskId", "link", "dateSubmitted"])

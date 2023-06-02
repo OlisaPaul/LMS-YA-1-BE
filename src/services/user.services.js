@@ -15,6 +15,10 @@ class UserService {
     return await User.findOne({ _id: userId, isDeleted: undefined });
   }
 
+  async getAllStudents() {
+    return await User.find({ role: "student", isDeleted: undefined });
+  }
+
   async getUserByEmail(email) {
     return await User.findOne({ email, isDeleted: undefined });
   }
@@ -27,14 +31,8 @@ class UserService {
     return await User.find({ isDeleted: undefined }).sort({ _id: -1 });
   }
 
-  async getAllEducators() {
-    return await User.find({ role: "educator", isDeleted: undefined }).sort({
-      _id: -1,
-    });
-  }
-
-  async getAllStudents() {
-    return await User.find({ role: "student", isDeleted: undefined }).sort({
+  async getUsersByLearningTrack(learningTrack) {
+    return await User.find({ learningTrack, isDeleted: undefined }).sort({
       _id: -1,
     });
   }

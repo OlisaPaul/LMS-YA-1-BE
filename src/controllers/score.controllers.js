@@ -1,11 +1,14 @@
 const _ = require("lodash");
 const { Score } = require("../model/score.model");
-const { Task } = require("../model/task.model");
-const { User } = require("../model/user.model");
 const scoreService = require("../services/score.services");
 const { MESSAGES } = require("../common/constants.common");
 const { errorMessage, successMessage } = require("../common/messages.common");
-const userService = require("../services/user.service");
+const userService = require("../services/user.services");
+const taskService = require("../services/task.services");
+const courseService = require("../services/course.services");
+const submissionService = require("../services/submission.services");
+const scoredTasksPerTrackService = require("../services/scoredTasksPerTrack.services");
+const processScoredTask = require("../utils/processTask");
 
 class ScoreController {
   async getStatus(req, res) {
@@ -14,17 +17,45 @@ class ScoreController {
 
   //Create a new score
   async addNewScore(req, res) {
-    // Checks if a score already exist by using the email id
-    const student = await User.findById(req.body.studentId);
-
+    // Checks if a score already exist
+    const student = await userService.getUserById(req.body.studentId);
     if (!student) return res.status(404).send(errorMessage(student, "student"));
 
-    const task = await Task.findById(req.body.taskId);
+    const submission = await submissionService.getSubmissionById(
+      req.body.submissionId
+    );
+    if (!submission)
+      return res.status(404).send(errorMessage(submission, "student"));
 
+    // if (submission.studentId != req.body.studentId)
+    //   return res.status(400).send({
+    //     success: false,
+    //     message: "You cannot assign score to another user.",
+    //   });
+
+    const task = await taskService.getTaskById(req.body.taskId);
     if (!task) return res.status(404).send(errorMessage(task, "task"));
 
-    let score = new Score(_.pick(req.body, ["studentId", "taskId", "score"]));
+    const userScorePerTask = await scoreService.getScoreByTaskIdAndUserId(
+      task._id,
+      student._id
+    );
 
+    if (userScorePerTask)
+      return res.status(400).send({
+        success: false,
+        message:
+          "The score has already been added for this student for this particular task.",
+      });
+
+    const [scoredTasksPerTrack] =
+      await scoredTasksPerTrackService.getScoredTasksPerTrack();
+
+    await processScoredTask(scoredTasksPerTrack, task, student, res);
+
+    let score = new Score(
+      _.pick(req.body, ["studentId", "taskId", "score", "submissionId"])
+    );
     score = await scoreService.createScore(score);
 
     res.send(successMessage(MESSAGES.CREATED, score));

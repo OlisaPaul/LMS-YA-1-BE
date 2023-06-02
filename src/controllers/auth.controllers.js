@@ -1,9 +1,6 @@
-const jwt = require("jsonwebtoken");
-const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
-const { User } = require("../model/user.model");
-const userService = require("../services/user.service");
+const userService = require("../services/user.services");
 const {
   loginSuccess,
   loginError,
@@ -14,9 +11,10 @@ class AuthController {
   //Create a new user
   async logIn(req, res) {
     // checking if the user exist
-    let userName = req.body.userName
-    if(!req.body.userName.startsWith("@")) userName = `@${userName}`  
-    
+    let userName = req.body.userName;
+    if (req.body.userName && !req.body.userName.startsWith("@"))
+      userName = `@${userName}`;
+
     let user = await userService.getUserByUsername(userName);
     if (!user) return res.status(400).send(errorMessageUserName());
 

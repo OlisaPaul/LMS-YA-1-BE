@@ -1,19 +1,18 @@
 const _ = require("lodash");
 const { Course } = require("../model/course.model");
 const { Task } = require("../model/task.model");
-const courseService = require("../services/course.service");
-const taskService = require("../services/task.service");
 const { MESSAGES } = require("../common/constants.common");
-
 const { errorMessage, successMessage } = require("../common/messages.common");
-const userService = require("../services/user.service");
+const userService = require("../services/user.services");
+const courseService = require("../services/course.services");
+const taskService = require("../services/task.services");
 
 class TaskController {
   async getStatus(req, res) {
     res.status(200).send({ message: MESSAGES.DEFAULT, success: true });
   }
 
-  //Create a new user
+  //Create a new task
   async addNewTask(req, res) {
     // Checks if a user already exist by using the email id
     const course = await Course.findById(req.body.courseId);
