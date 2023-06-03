@@ -2,8 +2,8 @@ const cloudinary = require("cloudinary").v2;
 const { Video } = require("../model/video.model");
 const videoService = require("../services/video.services");
 const { MESSAGES } = require("../common/constants.common");
-const videoServices = require("../services/video.services");
 const { successMessage, errorMessage } = require("../common/messages.common");
+const streamifier = require("streamifier");
 
 // Configure Cloudinary credentials
 cloudinary.config({
@@ -19,30 +19,45 @@ class VideoController {
 
   async uploadVideo(req, res) {
     try {
-      const { title, description } = req.body;
-      const fileBuffer = req.file.buff;
+      const { title, description, learningTrack } = req.body;
+      const fileBuffer = req.file.buffer;
 
-      // Upload file buffer to Cloudinary
-      const uploadedFile = await cloudinary.uploader.upload(fileBuffer, {
-        resource_type: "auto",
-      });
+      // Create a Cloudinary upload stream with specified options
+      const cld_upload_stream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: "video",
+          folder: "foo",
+        },
+        async function (error, result) {
+          if (error) {
+            console.error("Error uploading video:", error);
+            res.status(500).json({ error: "Internal Server Error" });
+          } else {
+            const videoUrl = result.secure_url;
 
-      // Save the Cloudinary URL of the uploaded file in the MongoDB document
-      const fileUrl = uploadedFile.secure_url;
+            // Create the video document and save it to MongoDB
+            const video = new Video({
+              title,
+              description,
+              learningTrack,
+              videoUrl,
+            });
+            await videoService.createVideo(video);
 
-      const video = new Video({ title, description, fileUrl });
+            res.send({ message: MESSAGES.FETCHED, video });
+          }
+        }
+      );
 
-      await videoService.createVideo(video);
-
-      res.send({ message: MESSAGES.FETCHED, video });
+      // Pipe the file buffer to the Cloudinary upload stream
+      streamifier.createReadStream(fileBuffer).pipe(cld_upload_stream);
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error uploading video:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
-
   async getAllVideos(req, res) {
-    const videos = await videoServices.getAllVideos();
+    const videos = await videoService.getAllVideos();
 
     // Add the Cloudinary URL to each video object
     const videosWithUrls = videos.map((video) => {
@@ -58,7 +73,7 @@ class VideoController {
   }
 
   async getVideoById(req, res) {
-    const video = await videoServices.getVideoById(req.params.id);
+    const video = await videoService.getVideoById(req.params.id);
 
     if (video) {
       res.send(successMessage(MESSAGES.FETCHED, video));
