@@ -13,7 +13,7 @@ const courseController = require("../controllers/course.controllers");
 router.post(
   "/",
   auth,
-  educator,
+  admin,
   validateMiddleware(validate),
   asyncMiddleware(courseController.addNewCourse)
 );

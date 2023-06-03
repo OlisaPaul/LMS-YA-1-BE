@@ -1,44 +1,46 @@
+const express = require("express");
+const router = express.Router();
 const validateMiddleware = require("../middleware/validate.middleware");
 const educator = require("../middleware/educator.middleware");
 const auth = require("../middleware/auth.middleware");
 const admin = require("../middleware/admin.middleware");
-const { validate, validatePatch } = require("../model/task.model");
-const express = require("express");
-const router = express.Router();
+const { validate, validatePatch } = require("../model/score.model");
 const asyncMiddleware = require("../middleware/async.middleware");
 const validateObjectId = require("../middleware/validateObjectId.middleware");
-const taskController = require("../controllers/task.controllers");
+const scoreController = require("../controllers/score.controllers");
+const studentMiddleware = require("../middleware/student.middleware");
 
-// This is used for registering a new task.
+// This is used for registering a new score.
 router.post(
   "/",
   auth,
   admin,
   validateMiddleware(validate),
-  asyncMiddleware(taskController.addNewTask)
+  asyncMiddleware(scoreController.addNewScore)
 );
 
-router.get("/", asyncMiddleware(taskController.fetchAllTasks));
+router.get("/", asyncMiddleware(scoreController.fetchAllScores));
 
 router.get(
   "/userId/:id",
   validateObjectId,
-  asyncMiddleware(taskController.getTaskByCourseId)
+  asyncMiddleware(scoreController.getScoreByUserId)
 );
 
 router.get(
   "/:id",
   validateObjectId,
-  asyncMiddleware(taskController.gethTaskById)
+  asyncMiddleware(scoreController.gethScoreById)
 );
 
 router.put(
   "/:id",
   validateObjectId,
-  // auth is used to make authenticate a task.
+  // auth is used to make authenticate a score.
   auth,
+  admin,
   validateMiddleware(validatePatch),
-  asyncMiddleware(taskController.updateTaskById)
+  asyncMiddleware(scoreController.updateScoreById)
 );
 
 router.delete(
@@ -46,6 +48,6 @@ router.delete(
   validateObjectId,
   auth,
   admin,
-  asyncMiddleware(taskController.deleteTask)
+  asyncMiddleware(scoreController.deleteScore)
 );
 module.exports = router;

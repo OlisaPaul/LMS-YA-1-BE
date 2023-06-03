@@ -11,7 +11,7 @@ class CourseService {
     return await Course.findOne({
       _id: courseId,
       isDeleted: undefined,
-    }).populate("userId");
+    });
   }
 
   async getCourseByUserId(userId) {
@@ -19,9 +19,7 @@ class CourseService {
   }
 
   async getAllCourses() {
-    return await Course.find({ isDeleted: undefined })
-      .sort({ _id: -1 })
-      .populate("userId");
+    return await Course.find({ isDeleted: undefined }).sort({ _id: -1 });
   }
 
   async updateCourseById(id, course) {

@@ -2,43 +2,44 @@ const validateMiddleware = require("../middleware/validate.middleware");
 const educator = require("../middleware/educator.middleware");
 const auth = require("../middleware/auth.middleware");
 const admin = require("../middleware/admin.middleware");
-const { validate, validatePatch } = require("../model/task.model");
+const { validate, validatePatch } = require("../model/submission.model");
 const express = require("express");
 const router = express.Router();
 const asyncMiddleware = require("../middleware/async.middleware");
 const validateObjectId = require("../middleware/validateObjectId.middleware");
-const taskController = require("../controllers/task.controllers");
+const submissionController = require("../controllers/submission.controllers");
+const studentMiddleware = require("../middleware/student.middleware");
 
-// This is used for registering a new task.
+// This is used for registering a new submission.
 router.post(
   "/",
   auth,
-  admin,
+  studentMiddleware,
   validateMiddleware(validate),
-  asyncMiddleware(taskController.addNewTask)
+  asyncMiddleware(submissionController.addNewSubmission)
 );
 
-router.get("/", asyncMiddleware(taskController.fetchAllTasks));
+router.get("/", asyncMiddleware(submissionController.fetchAllSubmissions));
 
 router.get(
   "/userId/:id",
   validateObjectId,
-  asyncMiddleware(taskController.getTaskByCourseId)
+  asyncMiddleware(submissionController.getSubmissionByUserId)
 );
 
 router.get(
   "/:id",
   validateObjectId,
-  asyncMiddleware(taskController.gethTaskById)
+  asyncMiddleware(submissionController.gethSubmissionById)
 );
 
 router.put(
   "/:id",
   validateObjectId,
-  // auth is used to make authenticate a task.
+  // auth is used to make authenticate a submission.
   auth,
   validateMiddleware(validatePatch),
-  asyncMiddleware(taskController.updateTaskById)
+  asyncMiddleware(submissionController.updateSubmissionById)
 );
 
 router.delete(
@@ -46,6 +47,6 @@ router.delete(
   validateObjectId,
   auth,
   admin,
-  asyncMiddleware(taskController.deleteTask)
+  asyncMiddleware(submissionController.deleteSubmission)
 );
 module.exports = router;
