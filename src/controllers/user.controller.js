@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const { Task } = require("../model/task.model");
 const { User } = require("../model/user.model");
 const { Score } = require("../model/score.model");
 const userService = require("../services/user.service");
@@ -144,7 +145,14 @@ class UserController {
       },
     ]);
 
-    res.json(scores);
+    const scoresWithGrade = scores.map(async function (score) {
+      const tasksPerTrack = await Task.find({
+        learningTrack: score.student.learningTrack,
+      });
+      return tasksPerTrack;
+    });
+
+    res.json(scoresWithGrade);
   }
 
   //get all educators in the user collection/table
