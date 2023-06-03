@@ -1,11 +1,10 @@
 const _ = require("lodash");
 const { Course } = require("../model/course.model");
 const { User } = require("../model/user.model");
-const courseService = require("../services/course.service");
+const courseService = require("../services/course.services");
 const { MESSAGES } = require("../common/constants.common");
-
 const { errorMessage, successMessage } = require("../common/messages.common");
-const userService = require("../services/user.service");
+const userService = require("../services/user.services");
 
 class CourseController {
   async getStatus(req, res) {
@@ -14,13 +13,8 @@ class CourseController {
 
   //Create a new course
   async addNewCourse(req, res) {
-    const educator = await User.findById(req.body.educatorId);
-
-    if (!educator)
-      return res.status(404).send(errorMessage(educator, "educator"));
-
     let course = new Course(
-      _.pick(req.body, ["educatorId", "courseContent", "learningTrack"])
+      _.pick(req.body, ["courseContent", "learningTrack"])
     );
 
     course = await courseService.createCourse(course);
@@ -36,19 +30,6 @@ class CourseController {
       res.send(successMessage(MESSAGES.FETCHED, course));
     } else {
       res.status(404).send(errorMessage(course, "course"));
-    }
-  }
-
-  async getCourseByUserId(req, res) {
-    const educator = await userService.getUserById(req.params.educatorId);
-    if (!educator) return errorMessage(educator, "educator");
-
-    const course = await courseService.getCourseByUserId(req.params.educatorId);
-
-    if (course) {
-      res.send(successMessage(MESSAGES.FETCHED, course));
-    } else {
-      res.status(404).send(errorMessageCourseName());
     }
   }
 
