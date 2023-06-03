@@ -19,14 +19,13 @@ const videoSchema = new mongoose.Schema({
 
 const Video = mongoose.model("Video", videoSchema);
 
-function validate(task) {
+function validate(video) {
   const schema = Joi.object({
-    courseId: Joi.objectId().required(),
+    title: Joi.string().required(),
     description: Joi.string().min(4).max(255).required(),
-    dueDate: Joi.date().iso().required(),
   });
 
-  return schema.validate(task);
+  return schema.validate(video);
 }
 
 function validatePatch(task) {

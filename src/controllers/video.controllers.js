@@ -20,23 +20,23 @@ class VideoController {
   async uploadVideo(req, res) {
     try {
       const { title, description } = req.body;
-      const videoPath = req.file.path;
+      const fileBuffer = req.file.buff;
 
-      // Upload video to Cloudinary
-      const uploadedVideo = await cloudinary.uploader.upload(videoPath, {
-        resource_type: "video",
+      // Upload file buffer to Cloudinary
+      const uploadedFile = await cloudinary.uploader.upload(fileBuffer, {
+        resource_type: "auto",
       });
 
-      // Save the Cloudinary URL of the uploaded video in the MongoDB document
-      const videoUrl = uploadedVideo.secure_url;
+      // Save the Cloudinary URL of the uploaded file in the MongoDB document
+      const fileUrl = uploadedFile.secure_url;
 
-      const video = new Video({ title, description, videoUrl });
+      const video = new Video({ title, description, fileUrl });
 
       await videoService.createVideo(video);
 
-      res.send(successMessage(MESSAGES.CREATED, video));
+      res.send({ message: MESSAGES.FETCHED, video });
     } catch (error) {
-      console.error("Error uploading video:", error);
+      console.error("Error uploading file:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
@@ -54,7 +54,7 @@ class VideoController {
       };
     });
 
-    res.json(videosWithUrls);
+    res.send(successMessage(MESSAGES.FETCHED, videosWithUrls));
   }
 
   async getVideoById(req, res) {
