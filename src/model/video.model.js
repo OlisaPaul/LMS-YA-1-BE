@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Joi = require("joi");
+const Joi = require("@hapi/joi");
 require("dotenv").config();
 
 const videoSchema = new mongoose.Schema({
@@ -11,6 +11,10 @@ const videoSchema = new mongoose.Schema({
     type: String,
     default: 0,
   },
+  learningTrack: {
+    type: [String],
+    required: true,
+  },
   videoUrl: {
     type: String,
     default: 0,
@@ -19,21 +23,34 @@ const videoSchema = new mongoose.Schema({
 
 const Video = mongoose.model("Video", videoSchema);
 
-function validate(task) {
+function validate(video) {
   const schema = Joi.object({
-    courseId: Joi.objectId().required(),
+    title: Joi.string().min(4).max(255).required(),
     description: Joi.string().min(4).max(255).required(),
-    dueDate: Joi.date().iso().required(),
+    // learningTrack: Joi.array()
+    //   .items(
+    //     Joi.string()
+    //       .valid("backend", "frontend", "product design", "web3")
+    //       .insensitive()
+    //   )
+    //   .min(1)
+    //   .required(),
   });
 
-  return schema.validate(task);
+  return schema.validate(video);
 }
 
 function validatePatch(task) {
   const schema = Joi.object({
-    courseId: Joi.string(),
+    title: Joi.string(),
     description: Joi.string().min(4).max(255),
-    dueDate: Joi.date().iso(),
+    learningTrack: Joi.array()
+      .items(
+        Joi.string()
+          .valid("backend", "frontend", "product design", "web3")
+          .insensitive()
+      )
+      .min(1),
   });
 
   return schema.validate(task);
