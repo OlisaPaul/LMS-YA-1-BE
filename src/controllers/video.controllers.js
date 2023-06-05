@@ -19,7 +19,7 @@ class VideoController {
 
   async uploadVideo(req, res) {
     try {
-      const { title, description, learningTrack } = req.body;
+      const { courseTitle, description, learningTrack } = req.body;
       const fileBuffer = req.file.buffer;
 
       // Create a Cloudinary upload stream with specified options
@@ -37,7 +37,7 @@ class VideoController {
 
             // Create the video document and save it to MongoDB
             const video = new Video({
-              title,
+              courseTitle,
               description,
               learningTrack,
               videoUrl,
@@ -63,7 +63,7 @@ class VideoController {
     const videosWithUrls = videos.map((video) => {
       return {
         _id: video._id,
-        title: video.title,
+        courseTitle: video.courseTitle,
         description: video.description,
         videoUrl: video.videoUrl,
       };
@@ -80,6 +80,20 @@ class VideoController {
     } else {
       res.status(404).send(errorMessage(video, "video"));
     }
+  }
+
+  async getVideosByLearningTrack(req, res) {
+    const videos = await videoService.getVideosByLearningTrack(
+      req.params.learningTrack
+    );
+
+    if (!videos || videos.length == 0)
+      return res.status(404).send({
+        success: false,
+        message: "No video for this learning track",
+      });
+
+    res.send(successMessage(MESSAGES.FETCHED, videos));
   }
 
   async deleteVideo(req, res) {

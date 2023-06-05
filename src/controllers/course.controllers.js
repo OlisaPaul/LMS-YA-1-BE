@@ -1,10 +1,17 @@
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
 const _ = require("lodash");
 const { Course } = require("../model/course.model");
-const { User } = require("../model/user.model");
 const courseService = require("../services/course.services");
 const { MESSAGES } = require("../common/constants.common");
 const { errorMessage, successMessage } = require("../common/messages.common");
-const userService = require("../services/user.services");
+
+// Configure Cloudinary credentials
+cloudinary.config({
+  cloud_name: "dejxb00g5",
+  api_key: "355873373978724",
+  api_secret: "fT3ADDnNmdTK5xP-JTpLk4Yn7q4",
+});
 
 class CourseController {
   async getStatus(req, res) {
@@ -12,14 +19,44 @@ class CourseController {
   }
 
   //Create a new course
-  async addNewCourse(req, res) {
-    let course = new Course(
-      _.pick(req.body, ["courseContent", "learningTrack"])
-    );
+  async uploadCourse(req, res) {
+    try {
+      const { courseTitle, description, learningTrack } = req.body;
+      const fileBuffer = req.file.buffer;
 
-    course = await courseService.createCourse(course);
+      // Create a Cloudinary upload stream with specified options
+      const cld_upload_stream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: "video",
+          folder: "foo",
+        },
+        async function (error, result) {
+          if (error) {
+            console.error("Error uploading video:", error);
+            res.status(500).json({ error: "Internal Server Error" });
+          } else {
+            const videoUrl = result.secure_url;
 
-    res.send(successMessage(MESSAGES.CREATED, course));
+            // Create the video document and save it to MongoDB
+            const course = new Course({
+              courseTitle,
+              description,
+              learningTrack,
+              videoUrl,
+            });
+            await courseService.createCourse(course);
+
+            res.send({ message: MESSAGES.FETCHED, course });
+          }
+        }
+      );
+
+      // Pipe the file buffer to the Cloudinary upload stream
+      streamifier.createReadStream(fileBuffer).pipe(cld_upload_stream);
+    } catch (error) {
+      console.error("Error uploading video:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
 
   //get course from the database, using their email
@@ -31,6 +68,20 @@ class CourseController {
     } else {
       res.status(404).send(errorMessage(course, "course"));
     }
+  }
+
+  async getCoursesByLearningTrack(req, res) {
+    const courses = await courseService.getCoursesByLearningTrack(
+      req.params.learningTrack
+    );
+
+    if (!courses || courses.length == 0)
+      return res.status(404).send({
+        success: false,
+        message: "No course for this learning track",
+      });
+
+    res.send(successMessage(MESSAGES.FETCHED, courses));
   }
 
   //get all courses in the course collection/table

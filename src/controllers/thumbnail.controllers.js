@@ -41,24 +41,9 @@ class ThumbnailController {
   }
 
   async gethThumbnailByLearningTrack(req, res) {
-    let learningTrack = req.params.learningTrack;
-    if (learningTrack) learningTrack = learningTrack.toLowerCase();
-
     const thumbnail = await thumbnailService.getThumbnailsByLearningTrack(
       req.params.learningTrack
     );
-
-    const learningTrackLists = [
-      "backend",
-      "frontend",
-      "web3",
-      "product design",
-    ];
-
-    if (!learningTrackLists.includes(learningTrack))
-      return res
-        .status(400)
-        .send({ success: false, message: "Invalid learning track" });
 
     if (thumbnail) {
       res.send(successMessage(MESSAGES.FETCHED, thumbnail));
