@@ -11,10 +11,7 @@ class CourseService {
   }
 
   async getCourseById(courseId) {
-    return await Course.findOne({
-      _id: courseId,
-      isDeleted: undefined,
-    });
+    return await Course.findById(courseId);
   }
 
   async getCoursesByLearningTrack(learningTrack) {

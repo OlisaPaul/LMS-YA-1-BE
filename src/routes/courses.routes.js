@@ -41,6 +41,7 @@ router.put(
   validateObjectId,
   // auth is used to make authenticate a course.
   auth,
+  admin,
   validateMiddleware(validatePatch),
   asyncMiddleware(courseController.updateCourseById)
 );

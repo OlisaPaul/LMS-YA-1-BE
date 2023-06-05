@@ -78,7 +78,7 @@ class VideoController {
     if (video) {
       res.send(successMessage(MESSAGES.FETCHED, video));
     } else {
-      res.status(404).send(errorMessage(video, "video"));
+      res.status(404).send(errorMessage("video"));
     }
   }
 
@@ -99,7 +99,7 @@ class VideoController {
   async deleteVideo(req, res) {
     const video = await videoService.getVideoById(req.params.id);
 
-    if (!video) return res.status(404).send(errorMessage(video, "video"));
+    if (!video) return res.status(404).send(errorMessage("video"));
 
     await videoService.deleteVideo(req.params.id);
 

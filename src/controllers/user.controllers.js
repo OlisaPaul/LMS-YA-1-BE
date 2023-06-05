@@ -91,7 +91,7 @@ class UserController {
     if (user) {
       res.send(successMessage(MESSAGES.FETCHED, user));
     } else {
-      res.status(404).send(errorMessage(user, "user"));
+      res.status(404).send(errorMessage("user"));
     }
   }
 
@@ -218,7 +218,7 @@ class UserController {
   async updateUserProfile(req, res) {
     let user = await userService.getUserById(req.params.id);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
+    if (!user) return res.status(404).send(errorMessage("user"));
 
     // makes sure the user can only update their account
     if (user._id != req.user._id)
@@ -242,7 +242,7 @@ class UserController {
   async deleteUserAccount(req, res) {
     const user = await userService.getUserById(req.params.id);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
+    if (!user) return res.status(404).send(errorMessage("user"));
 
     await userService.deleteUser(req.params.id);
 

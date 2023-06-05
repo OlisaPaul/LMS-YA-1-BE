@@ -17,11 +17,11 @@ class SubmissionController {
     // Checks if a submission exist
     const student = await userService.getUserById(req.body.studentId);
 
-    if (!student) return res.status(404).send(errorMessage(student, "student"));
+    if (!student) return res.status(404).send(errorMessage("student"));
 
     const task = await taskService.getTaskById(req.body.taskId);
 
-    if (!task) return res.status(404).send(errorMessage(task, "task"));
+    if (!task) return res.status(404).send(errorMessage("task"));
 
     //makes sure a user cannot submit links for a different learning Track
 
@@ -49,13 +49,13 @@ class SubmissionController {
     if (submission) {
       res.send(successMessage(MESSAGES.FETCHED, submission));
     } else {
-      res.status(404).send(errorMessage(submission, "submission"));
+      res.status(404).send(errorMessage("submission"));
     }
   }
 
   async getSubmissionByUserId(req, res) {
     const student = await userService.getUserById(req.params.studentId);
-    if (!student) return errorMessage(student, "student");
+    if (!student) return errorMessage("student");
 
     const submission = await submissionService.getSubmissionByUserId(
       req.params.studentId
@@ -79,8 +79,7 @@ class SubmissionController {
   async updateSubmissionById(req, res) {
     let submission = await submissionService.getSubmissionById(req.params.id);
 
-    if (!submission)
-      return res.status(404).send(errorMessage(submission, "submission"));
+    if (!submission) return res.status(404).send(errorMessage("submission"));
 
     submission = req.body;
 
@@ -96,8 +95,7 @@ class SubmissionController {
   async deleteSubmission(req, res) {
     const submission = await submissionService.getSubmissionById(req.params.id);
 
-    if (!submission)
-      return res.status(404).send(errorMessage(submission, "submission"));
+    if (!submission) return res.status(404).send(errorMessage("submission"));
 
     await submissionService.deleteSubmission(req.params.id);
 

@@ -37,6 +37,7 @@ router.put(
   validateObjectId,
   // auth is used to make authenticate a task.
   auth,
+  admin,
   validateMiddleware(validatePatch),
   asyncMiddleware(taskController.updateTaskById)
 );

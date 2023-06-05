@@ -66,7 +66,7 @@ class CourseController {
     if (course) {
       res.send(successMessage(MESSAGES.FETCHED, course));
     } else {
-      res.status(404).send(errorMessage(course, "course"));
+      res.status(404).send(errorMessage("course"));
     }
   }
 
@@ -95,20 +95,23 @@ class CourseController {
   async updateCourseById(req, res) {
     let course = await courseService.getCourseById(req.params.id);
 
-    if (!course) return res.status(404).send(errorMessage(course, "course"));
+    if (!course) return res.status(404).send(errorMessage("course"));
 
     course = req.body;
 
-    updatedCourse = await courseService.updateCourseById(req.params.id, course);
+    const updatedCourse = await courseService.updateCourseById(
+      req.params.id,
+      course
+    );
 
-    res.send(successMessage(MESSAGES.UPDATED, course));
+    res.send(successMessage(MESSAGES.UPDATED, updatedCourse));
   }
 
   //Delete course account entirely from the database
   async deleteCourse(req, res) {
     const course = await courseService.getCourseById(req.params.id);
 
-    if (!course) return res.status(404).send(errorMessage(course, "course"));
+    if (!course) return res.status(404).send(errorMessage("course"));
 
     await courseService.deleteCourse(req.params.id);
 
