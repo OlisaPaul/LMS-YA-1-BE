@@ -7,10 +7,10 @@ const router = express.Router();
 const asyncMiddleware = require("../middleware/async.middleware");
 const validateObjectId = require("../middleware/validateObjectId.middleware");
 const courseController = require("../controllers/course.controllers");
-const videoController = require("../controllers/video.controllers");
 const multer = require("multer");
-const validLearningtrackMiddleware = require("../middleware/validLearningtrack.middleware");
 const upload = multer({ storage: multer.memoryStorage() });
+const validLearningtrackMiddleware = require("../middleware/validLearningtrack.middleware");
+const validWeekMiddleware = require("../middleware//validWeek.middleware");
 
 // This is used for registering a new course.
 router.post(
@@ -34,6 +34,13 @@ router.get(
   "/learningTrack/:learningTrack",
   validLearningtrackMiddleware,
   asyncMiddleware(courseController.getCoursesByLearningTrack)
+);
+
+router.get(
+  "/learningTrack/:learningTrack/week/:week",
+  validLearningtrackMiddleware,
+  validWeekMiddleware,
+  asyncMiddleware(courseController.getCoursesByLearningTrackAndWeek)
 );
 
 router.put(

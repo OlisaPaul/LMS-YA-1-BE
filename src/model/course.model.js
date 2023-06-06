@@ -19,6 +19,10 @@ const courseSchema = new mongoose.Schema({
     type: String,
     default: 0,
   },
+  week: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Course = mongoose.model("Course", courseSchema);
@@ -27,6 +31,7 @@ function validate(course) {
   const schema = Joi.object({
     courseTitle: Joi.string().min(4).max(255).required(),
     description: Joi.string().min(4).max(255).required(),
+    week: Joi.number().min(1).max(52).required(),
     learningTrack: Joi.array()
       .items(
         Joi.string()
@@ -44,6 +49,7 @@ function validatePatch(task) {
   const schema = Joi.object({
     courseTitle: Joi.string(),
     description: Joi.string().min(4).max(255),
+    week: Joi.number().min(1).max(52),
     learningTrack: Joi.array()
       .items(
         Joi.string()
