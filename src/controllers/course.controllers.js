@@ -21,7 +21,7 @@ class CourseController {
   //Create a new course
   async uploadCourse(req, res) {
     try {
-      const { courseTitle, description, learningTrack } = req.body;
+      const { courseTitle, description, learningTrack, week } = req.body;
       const fileBuffer = req.file.buffer;
 
       // Create a Cloudinary upload stream with specified options
@@ -42,6 +42,7 @@ class CourseController {
               courseTitle,
               description,
               learningTrack,
+              week,
               videoUrl,
             });
             await courseService.createCourse(course);
@@ -79,6 +80,25 @@ class CourseController {
       return res.status(404).send({
         success: false,
         message: "No course for this learning track",
+      });
+
+    res.send(successMessage(MESSAGES.FETCHED, courses));
+  }
+
+  async getCoursesByLearningTrackAndWeek(req, res) {
+    let { week, learningTrack } = req.params;
+
+    if (learningTrack) learningTrack = learningTrack.toLowerCase();
+
+    const courses = await courseService.getCoursesByLearningTrackAndWeek(
+      learningTrack,
+      week
+    );
+
+    if (!courses || courses.length == 0)
+      return res.status(404).send({
+        success: false,
+        message: "No course for this learning track and week.",
       });
 
     res.send(successMessage(MESSAGES.FETCHED, courses));

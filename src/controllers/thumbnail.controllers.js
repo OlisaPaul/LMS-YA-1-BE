@@ -41,8 +41,11 @@ class ThumbnailController {
   }
 
   async gethThumbnailByLearningTrack(req, res) {
+    let { learningTrack } = req.params;
+    if (learningTrack) learningTrack = learningTrack.toLowerCase();
+
     const thumbnail = await thumbnailService.getThumbnailsByLearningTrack(
-      req.params.learningTrack
+      learningTrack
     );
 
     if (thumbnail) {

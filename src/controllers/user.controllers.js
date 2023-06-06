@@ -194,9 +194,10 @@ class UserController {
   }
   //get all educators in the user collection/table
   async fetchUserByLearningTrack(req, res) {
-    const users = await userService.getUsersByLearningTrack(
-      req.params.learningTrack
-    );
+    let { learningTrack } = req.params;
+    if (learningTrack) learningTrack = learningTrack.toLowerCase();
+
+    const users = await userService.getUsersByLearningTrack(learningTrack);
 
     res.send(successMessage(MESSAGES.FETCHED, users));
   }

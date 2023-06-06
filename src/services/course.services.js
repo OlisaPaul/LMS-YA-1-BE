@@ -7,7 +7,7 @@ class CourseService {
   }
 
   async getAllCourses() {
-    return await Course.find({ isDeleted: undefined }).sort({ _id: -1 });
+    return await Course.find({}).sort({ _id: -1 });
   }
 
   async getCourseById(courseId) {
@@ -15,7 +15,13 @@ class CourseService {
   }
 
   async getCoursesByLearningTrack(learningTrack) {
-    return await Course.find({ learningTrack, isDeleted: undefined }).sort({
+    return await Course.find({ learningTrack }).sort({
+      _id: -1,
+    });
+  }
+
+  async getCoursesByLearningTrackAndWeek(learningTrack, week) {
+    return await Course.find({ learningTrack, week }).sort({
       _id: -1,
     });
   }

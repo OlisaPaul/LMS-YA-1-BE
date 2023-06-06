@@ -99,9 +99,12 @@ class ScoreController {
 
     score = req.body;
 
-    updatedScore = await scoreService.updateScoreById(req.params.id, score);
+    const updatedScore = await scoreService.updateScoreById(
+      req.params.id,
+      score
+    );
 
-    res.send(successMessage(MESSAGES.UPDATED, score));
+    res.send(successMessage(MESSAGES.UPDATED, updatedScore));
   }
 
   //Delete score account entirely from the database
