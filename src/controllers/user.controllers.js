@@ -12,7 +12,6 @@ const {
   errorMessageUserName,
   successMessage,
   unAuthMessage,
-  errorMessageUserName,
 } = require("../common/messages.common");
 const generateRandomAvatar = require("../utils/generateRandomAvatar.utils");
 const scoreServices = require("../services/score.services");
@@ -38,7 +37,6 @@ class UserController {
         message: "Username has been taken, please use another one",
       });
 
-
     user = new User(
       _.pick(req.body, [
         "firstName",
@@ -52,10 +50,9 @@ class UserController {
       ])
     );
 
-    user.learningTrack = user.learningTrack.toLowerCase()
+    user.learningTrack = user.learningTrack.toLowerCase();
 
     user = new User(user);
-
 
     const avatarUrl = await generateRandomAvatar(user.email);
     user.avatarUrl = avatarUrl;
