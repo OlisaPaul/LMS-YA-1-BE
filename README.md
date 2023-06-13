@@ -127,3 +127,4 @@ To deploy this project run
 ## Authors
 
 - [@OlisaPaul](https://www.github.com/OlisaPaul)
+- [@Akolite98](https://www.github.com/Akolite98)
