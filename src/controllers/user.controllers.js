@@ -156,7 +156,10 @@ class UserController {
 
     const studentWithoutScores = students
       .filter((student) => {
-        return !scores.some((score) => score.student[0]._id == student._id);
+        const studentId = student._id.toString(); // Convert ObjectId to string
+        return !scores.some((score) =>
+          score.student[0]._id.toString().includes(studentId)
+        );
       })
       .map((student) => {
         return {
