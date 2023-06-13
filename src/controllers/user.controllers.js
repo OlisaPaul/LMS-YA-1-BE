@@ -9,9 +9,9 @@ const scoredTasksPerTrackService = require("../services/scoredTasksPerTrack.serv
 
 const {
   errorMessage,
+  errorMessageUserName,
   successMessage,
   unAuthMessage,
-  errorMessageUserName,
 } = require("../common/messages.common");
 const generateRandomAvatar = require("../utils/generateRandomAvatar.utils");
 const scoreServices = require("../services/score.services");
@@ -49,6 +49,10 @@ class UserController {
         "learningTrack",
       ])
     );
+
+    user.learningTrack = user.learningTrack.toLowerCase();
+
+    user = new User(user);
 
     const avatarUrl = await generateRandomAvatar(user.email);
     user.avatarUrl = avatarUrl;

@@ -1,7 +1,11 @@
 const validateMiddleware = require("../middleware/validate.middleware");
 const auth = require("../middleware/auth.middleware");
 const admin = require("../middleware/admin.middleware");
-const { validate, validatePatch } = require("../model/course.model");
+const {
+  validate,
+  validatePatch,
+  videoTypeValidator,
+} = require("../model/course.model");
 const express = require("express");
 const router = express.Router();
 const asyncMiddleware = require("../middleware/async.middleware");
@@ -11,6 +15,7 @@ const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 const validLearningtrackMiddleware = require("../middleware/validLearningtrack.middleware");
 const validWeekMiddleware = require("../middleware//validWeek.middleware");
+const validateFileMiddleware = require("../middleware/validateFile.middleware");
 
 // This is used for registering a new course.
 router.post(
@@ -19,6 +24,7 @@ router.post(
   auth,
   admin,
   validateMiddleware(validate),
+  validateFileMiddleware("Video", videoTypeValidator),
   asyncMiddleware(courseController.uploadCourse)
 );
 
