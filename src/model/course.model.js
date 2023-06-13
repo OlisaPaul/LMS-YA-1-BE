@@ -62,6 +62,18 @@ function validatePatch(task) {
   return schema.validate(task);
 }
 
+const videoTypeValidator = Joi.object({
+  fieldname: Joi.string().required(),
+  originalname: Joi.string().required(),
+  encoding: Joi.string().required(),
+  mimetype: Joi.string()
+    .valid("video/mp4", "video/x-matroska", "video/avi")
+    .required(),
+  size: Joi.number().required(),
+  buffer: Joi.required(),
+});
+
 exports.Course = Course;
+exports.videoTypeValidator = videoTypeValidator;
 exports.validate = validate;
 exports.validatePatch = validatePatch;
