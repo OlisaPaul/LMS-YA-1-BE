@@ -111,7 +111,7 @@ function validatePatch(user) {
     firstName: Joi.string().min(4).max(255),
     lastName: Joi.string().min(4).max(255),
     password: Joi.string().min(5).max(1024),
-    userName: Joi.string().min(4).max(255).required(),
+    userName: Joi.string().min(4).max(255),
     eth: Joi.string().min(4).max(255).required(),
     email: Joi.string().email().min(5).max(255),
     learningTrack: Joi.string()
