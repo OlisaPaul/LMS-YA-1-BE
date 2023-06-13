@@ -1,6 +1,6 @@
 const cloudinary = require("cloudinary").v2;
-const { Video } = require("../model/certification.model");
-const videoService = require("../services/cerfication.services");
+const { Certificate } = require("../model/certificates.model");
+const certificateService = require("../services/certificates.services");
 const { MESSAGES } = require("../common/constants.common");
 const { successMessage, errorMessage } = require("../common/messages.common");
 const streamifier = require("streamifier");
@@ -24,7 +24,7 @@ class CertificationController {
 
       const cld_upload_stream = cloudinary.uploader.upload_stream(
         {
-          resource_type: "certificate",
+          resource_type: "image",
           folder: "foo",
         },
 

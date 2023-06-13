@@ -1,5 +1,4 @@
-const { Certificate } = require("../model/certification.model");
-const bcrypt = require("bcrypt");
+const { Certificate } = require("../model/certificates.model");
 
 class CertificationService {
   //Create new certificate
