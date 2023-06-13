@@ -91,7 +91,7 @@ class UserController {
     if (user) {
       res.send(successMessage(MESSAGES.FETCHED, user));
     } else {
-      res.status(404).send(errorMessage(user, "user"));
+      res.status(404).send(errorMessage("user"));
     }
   }
 
@@ -156,7 +156,10 @@ class UserController {
 
     const studentWithoutScores = students
       .filter((student) => {
-        return !scores.some((score) => score.student[0]._id == student._id);
+        const studentId = student._id.toString(); // Convert ObjectId to string
+        return !scores.some((score) =>
+          score.student[0]._id.toString().includes(studentId)
+        );
       })
       .map((student) => {
         return {
@@ -194,9 +197,10 @@ class UserController {
   }
   //get all educators in the user collection/table
   async fetchUserByLearningTrack(req, res) {
-    const users = await userService.getUsersByLearningTrack(
-      req.params.learningTrack
-    );
+    let { learningTrack } = req.params;
+    if (learningTrack) learningTrack = learningTrack.toLowerCase();
+
+    const users = await userService.getUsersByLearningTrack(learningTrack);
 
     res.send(successMessage(MESSAGES.FETCHED, users));
   }
@@ -218,7 +222,7 @@ class UserController {
   async updateUserProfile(req, res) {
     let user = await userService.getUserById(req.params.id);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
+    if (!user) return res.status(404).send(errorMessage("user"));
 
     // makes sure the user can only update their account
     if (user._id != req.user._id)
@@ -242,7 +246,7 @@ class UserController {
   async deleteUserAccount(req, res) {
     const user = await userService.getUserById(req.params.id);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
+    if (!user) return res.status(404).send(errorMessage("user"));
 
     await userService.deleteUser(req.params.id);
 

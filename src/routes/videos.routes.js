@@ -8,6 +8,7 @@ const validateMiddleware = require("../middleware/validate.middleware");
 const { validate } = require("../model/video.model");
 const validateObjectId = require("../middleware/validateObjectId.middleware");
 const multer = require("multer");
+const validLearningtrackMiddleware = require("../middleware/validLearningtrack.middleware");
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post(
@@ -25,6 +26,12 @@ router.get(
   "/:id",
   validateObjectId,
   asyncMiddleware(videoController.getVideoById)
+);
+
+router.get(
+  "/learningTrack/:learningTrack",
+  validLearningtrackMiddleware,
+  asyncMiddleware(videoController.getVideosByLearningTrack)
 );
 
 router.delete(

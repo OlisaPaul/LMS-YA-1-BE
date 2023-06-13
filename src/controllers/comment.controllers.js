@@ -18,11 +18,11 @@ class CommentController {
   async createComment(req, res) {
     const user = await userService.getUserById(req.body.userId);
 
-    if (!user) res.status(404).send(errorMessage(user, "user"));
+    if (!user) res.status(404).send(errorMessage("user"));
 
     const post = await postService.getPostById(req.body.postId);
 
-    if (!post) res.status(404).send(errorMessage(post, "post"));
+    if (!post) res.status(404).send(errorMessage("post"));
 
     // makes sure the authenticated user is the same person as the user passed in the body of request
     if (req.user._id != req.body.userId)
@@ -56,7 +56,7 @@ class CommentController {
     if (comment) {
       res.send(successMessage(MESSAGES.FETCHED, comment));
     } else {
-      res.status(404).send(errorMessage(comment, "comment"));
+      res.status(404).send(errorMessage("comment"));
     }
   }
 
@@ -66,7 +66,7 @@ class CommentController {
     if (comment) {
       res.send(successMessage(MESSAGES.FETCHED, comment));
     } else {
-      res.status(404).send(errorMessage(comment, "comment", "post"));
+      res.status(404).send(errorMessage("comment", "post"));
     }
   }
 
@@ -76,9 +76,7 @@ class CommentController {
     );
 
     if (commentsOnPost.length <= 0)
-      return res
-        .status(404)
-        .send(errorMessage(commentsOnPost, "comment", "post"));
+      return res.status(404).send(errorMessage("comment", "post"));
 
     const comment = await commentService.getCommentsOnPostByUserId(
       req.params.userId,
@@ -88,7 +86,7 @@ class CommentController {
     if (comment && comment.length > 0) {
       res.send(successMessage(MESSAGES.FETCHED, comment));
     } else {
-      res.status(404).send(errorMessage(comment, "comment"));
+      res.status(404).send(errorMessage("comment"));
     }
   }
 
@@ -98,9 +96,7 @@ class CommentController {
     );
 
     if (commentsOnPost.length <= 0)
-      return res
-        .status(404)
-        .send(errorMessage(commentsOnPost, "comment", "post"));
+      return res.status(404).send(errorMessage("comment", "post"));
 
     const comment = await commentService.getSingleCommentOnPostByUserId(
       req.params.userId,
@@ -111,7 +107,7 @@ class CommentController {
     if (comment && comment.length > 0) {
       res.send(successMessage(MESSAGES.FETCHED, comment));
     } else {
-      res.status(404).send(errorMessage(comment, "comment"));
+      res.status(404).send(errorMessage("comment"));
     }
   }
 
@@ -119,7 +115,7 @@ class CommentController {
   async updateComment(req, res) {
     let comment = await commentService.getCommentById(req.params.id);
 
-    if (!comment) return res.status(404).send(errorMessage(comment, "comment"));
+    if (!comment) return res.status(404).send(errorMessage("comment"));
 
     // it makes sure a user cannot update a comment made by another user
     if (req.user._id != comment.userId)
@@ -136,7 +132,7 @@ class CommentController {
   async deleteComment(req, res) {
     let comment = await commentService.getCommentById(req.params.id);
 
-    if (!comment) return res.status(404).send(errorMessage(comment, "comment"));
+    if (!comment) return res.status(404).send(errorMessage("comment"));
 
     // it makes sure a user cannot update a comment made by another user
     if (req.user._id != comment.userId)

@@ -18,7 +18,7 @@ class ThumbnailService {
   }
 
   async getThumbnailsByLearningTrack(learningTrack) {
-    return await Thumbnail.findOne({
+    return await Thumbnail.find({
       learningTrack: learningTrack,
     });
   }

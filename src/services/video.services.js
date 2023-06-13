@@ -1,5 +1,4 @@
 const { Video } = require("../model/video.model");
-const bcrypt = require("bcrypt");
 
 class VideoService {
   //Create new video
@@ -16,6 +15,12 @@ class VideoService {
 
   async getAllVideos() {
     return await Video.find();
+  }
+
+  async getVideosByLearningTrack(learningTrack) {
+    return await Video.find({ learningTrack, isDeleted: undefined }).sort({
+      _id: -1,
+    });
   }
 
   async updateVideoById(id, video) {

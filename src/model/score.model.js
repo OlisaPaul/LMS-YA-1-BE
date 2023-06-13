@@ -43,8 +43,6 @@ function validate(score) {
 
 function validatePatch(score) {
   const schema = Joi.object({
-    taskId: Joi.objectId(),
-    studentId: Joi.objectId(),
     submissionId: Joi.objectId(),
     score: Joi.number().min(0).max(100),
   });

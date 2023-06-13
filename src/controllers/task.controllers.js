@@ -35,7 +35,7 @@ class TaskController {
     if (task) {
       res.send(successMessage(MESSAGES.FETCHED, task));
     } else {
-      res.status(404).send(errorMessage(task, "task"));
+      res.status(404).send(errorMessage("task"));
     }
   }
 
@@ -48,7 +48,7 @@ class TaskController {
     if (task) {
       res.send(successMessage(MESSAGES.FETCHED, task));
     } else {
-      res.status(404).send(errorMessage(task, "task", "course"));
+      res.status(404).send(errorMessage("task", "course"));
     }
   }
 
@@ -62,21 +62,24 @@ class TaskController {
   //Update/edit task data
   async updateTaskById(req, res) {
     let task = await taskService.getTaskById(req.params.id);
+    if (!task) return res.status(404).send(errorMessage("task"));
 
-    if (!task) return res.status(404).send(errorMessage(task, "task"));
+    const course = await courseService.getCourseById(req.body.courseId);
+    if (req.body.courseId && !course)
+      return res.status(404).send(errorMessage("course"));
 
     task = req.body;
 
-    updatedTask = await taskService.updateTaskById(req.params.id, task);
+    const updatedTask = await taskService.updateTaskById(req.params.id, task);
 
-    res.send(successMessage(MESSAGES.UPDATED, task));
+    res.send(successMessage(MESSAGES.UPDATED, updatedTask));
   }
 
   //Delete task account entirely from the database
   async deleteTask(req, res) {
     const task = await taskService.getTaskById(req.params.id);
 
-    if (!task) return res.status(404).send(errorMessage(task, "task"));
+    if (!task) return res.status(404).send(errorMessage("task"));
 
     await taskService.deleteTask(req.params.id);
 

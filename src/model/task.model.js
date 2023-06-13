@@ -36,7 +36,7 @@ function validate(task) {
 
 function validatePatch(task) {
   const schema = Joi.object({
-    courseId: Joi.string(),
+    courseId: Joi.objectId(),
     description: Joi.string().min(4).max(255),
     dueDate: Joi.date().iso(),
   });
