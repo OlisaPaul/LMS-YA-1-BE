@@ -18,7 +18,7 @@ class ScoreController {
   //Create a new score
   async addNewScore(req, res) {
     // Checks if a score already exist
-    const student = await userService.getUserById(req.body.studentId);
+    const student = await userService.getStudentById(req.body.studentId);
     if (!student) return res.status(404).send(errorMessage(student, "student"));
 
     const submission = await submissionService.getSubmissionById(
@@ -52,6 +52,13 @@ class ScoreController {
       await scoredTasksPerTrackService.getScoredTasksPerTrack();
 
     await processScoredTask(scoredTasksPerTrack, task, student, res);
+
+    const updatedScore = (student[0].totalScore =
+      student[0].totalScore + score.score);
+
+    await userService.updateUserById(student[0]._id, {
+      totalScore: updatedScore,
+    });
 
     let score = new Score(
       _.pick(req.body, ["studentId", "taskId", "score", "submissionId"])

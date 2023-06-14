@@ -60,6 +60,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  totalScore: {
+    type: Number,
+    default: 0,
+  },
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -73,6 +77,7 @@ userSchema.methods.generateAuthToken = function () {
       role: this.role,
       avatarUrl: this.avatarUrl,
       learningTrack: this.learningTrack,
+      totalScore: this.totalScore,
     },
     process.env.jwtPrivateKey
   );
