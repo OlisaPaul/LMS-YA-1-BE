@@ -12,7 +12,7 @@ class UserService {
   }
 
   async getUserById(userId) {
-    return await User.findOne({ _id: userId, isDeleted: undefined });
+    return await User.findById(userId);
   }
 
   async getAllStudents() {
