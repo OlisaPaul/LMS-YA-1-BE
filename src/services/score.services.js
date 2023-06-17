@@ -58,8 +58,6 @@ class ScoreService {
   async softDeleteScore(id) {
     const score = await Score.findById(id);
 
-    score.isDeleted = true;
-
     return await score.save();
   }
 }

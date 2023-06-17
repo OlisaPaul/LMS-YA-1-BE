@@ -6,15 +6,20 @@ const { Course } = require("../model/course.model");
 const userService = require("../services/user.services");
 const { MESSAGES } = require("../common/constants.common");
 const scoredTasksPerTrackService = require("../services/scoredTasksPerTrack.services");
+const propertiesToPick = require("../common/propertiesToPick.common");
+const {
+  getUserWithGrade,
+  getUsersWithGrade,
+} = require("../utils/getUserWithGrade.utils");
 
 const {
   errorMessage,
   errorMessageUserName,
   successMessage,
-  unAuthMessage,
 } = require("../common/messages.common");
 const generateRandomAvatar = require("../utils/generateRandomAvatar.utils");
 const scoreServices = require("../services/score.services");
+const getUserWithGradeUtils = require("../utils/getUserWithGrade.utils");
 
 class UserController {
   async getStatus(req, res) {
@@ -37,18 +42,7 @@ class UserController {
         message: "Username has been taken, please use another one",
       });
 
-    user = new User(
-      _.pick(req.body, [
-        "firstName",
-        "lastName",
-        "password",
-        "email",
-        "userName",
-        "eth",
-        "role",
-        "learningTrack",
-      ])
-    );
+    user = new User(_.pick(req.body, [...propertiesToPick, "password"]));
 
     user.learningTrack = user.learningTrack.toLowerCase();
 
@@ -68,18 +62,7 @@ class UserController {
     // it creates a token which is sent as an header to the client
     const token = user.generateAuthToken();
 
-    user = _.pick(user, [
-      "_id",
-      "firstName",
-      "lastName",
-      "email",
-      "userName",
-      "learningTrack",
-      "eth",
-      "role",
-      "avatarUrl",
-      "avatarImgTag",
-    ]);
+    user = _.pick(user, propertiesToPick);
 
     res
       .header("x-auth-header", token)
@@ -95,57 +78,27 @@ class UserController {
       scoredTasksPerTrackService.getScoredTasksPerTrack(),
     ]);
 
-    const learningTrack =
-      user.learningTrack === "product design"
-        ? "productDesign"
-        : user.learningTrack;
+    if (!user) return res.status(404).send(errorMessage("user"));
 
-    const totalTaskPerTrack = scoredTasksPerTrack[learningTrack];
+    const userWithGrade = getUserWithGrade(user, scoredTasksPerTrack);
 
-    const totalScore = user.totalScore;
-
-    const grade = totalScore / totalTaskPerTrack;
-
-    const userWithgrade = { ...user, grade };
-
-    const propertiesToPick = [
-      "_id",
-      "firstName",
-      "lastName",
-      "email",
-      "username",
-      "learningTrack",
-      "avatarUrl",
-      "avatarImgTag",
-      "eth",
-      "role",
-      "totalScore",
-      "grade",
-    ];
-
-    const simplifiedUser = _.pick(userWithgrade._doc, propertiesToPick);
-    simplifiedUser.grade = grade;
-
-    console.log(simplifiedUser);
-
-    if (user) {
-      res.send(successMessage(MESSAGES.FETCHED, simplifiedUser));
-    } else {
-      res.status(404).send(errorMessage("user"));
-    }
+    res.send(successMessage(MESSAGES.FETCHED, userWithGrade));
   }
 
   async getUserByUsername(req, res) {
     let userName = req.params.userName;
     if (userName && !userName.startsWith("@")) userName = `@${userName}`;
 
-    const user = await userService.getUserByUsername(userName);
+    let [user, [scoredTasksPerTrack]] = await Promise.all([
+      userService.getUserByUsername(userName),
+      scoredTasksPerTrackService.getScoredTasksPerTrack(),
+    ]);
 
-    if (user) {
-      res.send(successMessage(MESSAGES.FETCHED, user));
-    } else {
-      res.status(404).send(errorMessageUserName());
-    }
+    if (!user) return res.status(404).send(errorMessageUserName());
+
+    const userWithGrade = getUserWithGrade(user, scoredTasksPerTrack);
+
+    res.send(successMessage(MESSAGES.FETCHED, userWithGrade));
   }
 
   async getTotalScoresPerUser(req, res) {
@@ -240,22 +193,37 @@ class UserController {
     let { learningTrack } = req.params;
     if (learningTrack) learningTrack = learningTrack.toLowerCase();
 
-    const users = await userService.getUsersByLearningTrack(learningTrack);
+    let [users, [scoredTasksPerTrack]] = await Promise.all([
+      userService.getUsersByLearningTrack(learningTrack),
+      scoredTasksPerTrackService.getScoredTasksPerTrack(),
+    ]);
 
-    res.send(successMessage(MESSAGES.FETCHED, users));
+    const usersWithGrade = getUsersWithGrade(users, scoredTasksPerTrack);
+
+    res.send(successMessage(MESSAGES.FETCHED, usersWithGrade));
   }
 
   //get all users in the user collection/table
   async fetchAllUsers(req, res) {
-    const users = await userService.getAllUsers();
+    let [users, [scoredTasksPerTrack]] = await Promise.all([
+      userService.getAllUsers(),
+      scoredTasksPerTrackService.getScoredTasksPerTrack(),
+    ]);
 
-    res.send(successMessage(MESSAGES.FETCHED, users));
+    const usersWithGrade = getUsersWithGrade(users, scoredTasksPerTrack);
+
+    res.send(successMessage(MESSAGES.FETCHED, usersWithGrade));
   }
 
   async fetchAllStudents(req, res) {
-    const students = await userService.getAllStudents();
+    let [students, [scoredTasksPerTrack]] = await Promise.all([
+      userService.getAllStudents(),
+      scoredTasksPerTrackService.getScoredTasksPerTrack(),
+    ]);
 
-    res.send(successMessage(MESSAGES.FETCHED, students));
+    const studentsWithGrade = getUsersWithGrade(students, scoredTasksPerTrack);
+
+    res.send(successMessage(MESSAGES.FETCHED, studentsWithGrade));
   }
 
   //Update/edit user data
