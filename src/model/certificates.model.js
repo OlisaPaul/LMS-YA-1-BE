@@ -3,9 +3,10 @@ const Joi = require("@hapi/joi");
 require("dotenv").config();
 
 const certificateSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    default: 0,
+  studentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
   },
   cohort: {
     type: String,

@@ -19,6 +19,10 @@ class UserService {
     return await User.find({ role: "student", isDeleted: undefined });
   }
 
+  async getStudentById(studentId) {
+    return await User.find({ role: "student", _id: studentId });
+  }
+
   async getUserByEmail(email) {
     return await User.findOne({ email, isDeleted: undefined });
   }

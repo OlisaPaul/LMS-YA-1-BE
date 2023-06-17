@@ -17,22 +17,22 @@ class ScoreController {
 
   //Create a new score
   async addNewScore(req, res) {
-    // Checks if a score already exist
-    const student = await userService.getUserById(req.body.studentId);
-    if (!student) return res.status(404).send(errorMessage("student"));
+    const { studentId, submissionId, taskId } = req.body;
 
-    const submission = await submissionService.getSubmissionById(
-      req.body.submissionId
-    );
-    if (!submission) return res.status(404).send(errorMessage("submission"));
-
-    // if (submission.studentId != req.body.studentId)
+    // Checks if a student exist
+    const [[student], submission, task] = await Promise.all([
+      userService.getStudentById(studentId),
+      submissionService.getSubmissionById(submissionId),
+      taskService.getTaskById(taskId),
+    ]);
+    // if (submission.studentId != studentId)
     //   return res.status(400).send({
     //     success: false,
     //     message: "You cannot assign score to another user.",
     //   });
 
-    const task = await taskService.getTaskById(req.body.taskId);
+    if (!student) return res.status(404).send(errorMessage("student"));
+    if (!submission) return res.status(404).send(errorMessage("submission"));
     if (!task) return res.status(404).send(errorMessage("task"));
 
     const userScorePerTask = await scoreService.getScoreByTaskIdAndUserId(
@@ -47,15 +47,40 @@ class ScoreController {
           "The score has already been added for this student for this particular task.",
       });
 
-    const [scoredTasksPerTrack] =
-      await scoredTasksPerTrackService.getScoredTasksPerTrack();
+    const course = await courseService.getCourseById(task.courseId);
 
-    await processScoredTask(scoredTasksPerTrack, task, student, res);
+    //makes sure a user cannot have score for a different learning Track
+    //console.log(course);
+
+    if (!course.learningTrack.includes(student.learningTrack))
+      return res.status(400).send({
+        success: false,
+        message: "You cannot submit a score for a different learning track",
+      });
+
+    const learningTrack =
+      student.learningTrack === "product design"
+        ? "productDesign"
+        : student.learningTrack;
+
+    const scoredTasksPerTrack = await processScoredTask(task, course);
+
+    const totalTaskPerTrack = scoredTasksPerTrack[learningTrack];
 
     let score = new Score(
       _.pick(req.body, ["studentId", "taskId", "score", "submissionId"])
     );
     score = await scoreService.createScore(score);
+
+    const updatedTotalScore = (student.totalScore =
+      student.totalScore + score.score);
+
+    const grade = updatedTotalScore / totalTaskPerTrack;
+
+    await userService.updateUserById(student._id, {
+      totalScore: updatedTotalScore,
+      grade,
+    });
 
     res.send(successMessage(MESSAGES.CREATED, score));
   }

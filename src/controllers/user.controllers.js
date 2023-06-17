@@ -90,10 +90,46 @@ class UserController {
 
   //get user from the database, using their email
   async gethUserById(req, res) {
-    const user = await userService.getUserById(req.params.id);
+    let [user, [scoredTasksPerTrack]] = await Promise.all([
+      userService.getUserById(req.params.id),
+      scoredTasksPerTrackService.getScoredTasksPerTrack(),
+    ]);
+
+    const learningTrack =
+      user.learningTrack === "product design"
+        ? "productDesign"
+        : user.learningTrack;
+
+    const totalTaskPerTrack = scoredTasksPerTrack[learningTrack];
+
+    const totalScore = user.totalScore;
+
+    const grade = totalScore / totalTaskPerTrack;
+
+    const userWithgrade = { ...user, grade };
+
+    const propertiesToPick = [
+      "_id",
+      "firstName",
+      "lastName",
+      "email",
+      "username",
+      "learningTrack",
+      "avatarUrl",
+      "avatarImgTag",
+      "eth",
+      "role",
+      "totalScore",
+      "grade",
+    ];
+
+    const simplifiedUser = _.pick(userWithgrade._doc, propertiesToPick);
+    simplifiedUser.grade = grade;
+
+    console.log(simplifiedUser);
 
     if (user) {
-      res.send(successMessage(MESSAGES.FETCHED, user));
+      res.send(successMessage(MESSAGES.FETCHED, simplifiedUser));
     } else {
       res.status(404).send(errorMessage("user"));
     }
@@ -158,7 +194,7 @@ class UserController {
       },
     ]);
 
-    const studentWithoutScores = students
+    const studentsWithoutScores = students
       .filter((student) => {
         const studentId = student._id.toString(); // Convert ObjectId to string
         return !scores.some((score) =>
@@ -195,7 +231,7 @@ class UserController {
       return score;
     });
 
-    scoresWithGrade.push(...studentWithoutScores);
+    scoresWithGrade.push(...studentsWithoutScores);
 
     res.json(scoresWithGrade);
   }
@@ -227,12 +263,6 @@ class UserController {
     let user = await userService.getUserById(req.params.id);
 
     if (!user) return res.status(404).send(errorMessage("user"));
-
-    // makes sure the user can only update their account
-    if (user._id != req.user._id)
-      return res
-        .status(401)
-        .send(unAuthMessage(MESSAGES.UNAUTHORIZE("update")));
 
     let updatedUser = req.body;
 
