@@ -24,7 +24,7 @@ router.get("/", asyncMiddleware(scoreController.fetchAllScores));
 router.get(
   "/userId/:id",
   validateObjectId,
-  asyncMiddleware(scoreController.getScoreByUserId)
+  asyncMiddleware(scoreController.getScoreByStudentId)
 );
 
 router.get(

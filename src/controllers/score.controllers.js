@@ -17,24 +17,23 @@ class ScoreController {
 
   //Create a new score
   async addNewScore(req, res) {
-    // Checks if a score already exist
-    const student = await userService.getStudentById(req.body.studentId);
-    if (!student) return res.status(404).send(errorMessage(student, "student"));
+    const { studentId, submissionId, taskId } = req.body;
 
-    const submission = await submissionService.getSubmissionById(
-      req.body.submissionId
-    );
-    if (!submission)
-      return res.status(404).send(errorMessage(submission, "student"));
-
-    // if (submission.studentId != req.body.studentId)
+    // Checks if a student exist
+    const [[student], submission, task] = await Promise.all([
+      userService.getStudentById(studentId),
+      submissionService.getSubmissionById(submissionId),
+      taskService.getTaskById(taskId),
+    ]);
+    // if (submission.studentId != studentId)
     //   return res.status(400).send({
     //     success: false,
     //     message: "You cannot assign score to another user.",
     //   });
 
-    const task = await taskService.getTaskById(req.body.taskId);
-    if (!task) return res.status(404).send(errorMessage(task, "task"));
+    if (!student) return res.status(404).send(errorMessage("student"));
+    if (!submission) return res.status(404).send(errorMessage("submission"));
+    if (!task) return res.status(404).send(errorMessage("task"));
 
     const userScorePerTask = await scoreService.getScoreByTaskIdAndUserId(
       task._id,
@@ -48,22 +47,40 @@ class ScoreController {
           "The score has already been added for this student for this particular task.",
       });
 
-    const [scoredTasksPerTrack] =
-      await scoredTasksPerTrackService.getScoredTasksPerTrack();
+    const course = await courseService.getCourseById(task.courseId);
 
-    await processScoredTask(scoredTasksPerTrack, task, student, res);
+    //makes sure a user cannot have score for a different learning Track
+    //console.log(course);
 
-    const updatedScore = (student[0].totalScore =
-      student[0].totalScore + score.score);
+    if (!course.learningTrack.includes(student.learningTrack))
+      return res.status(400).send({
+        success: false,
+        message: "You cannot submit a score for a different learning track",
+      });
 
-    await userService.updateUserById(student[0]._id, {
-      totalScore: updatedScore,
-    });
+    const learningTrack =
+      student.learningTrack === "product design"
+        ? "productDesign"
+        : student.learningTrack;
+
+    const scoredTasksPerTrack = await processScoredTask(task, course);
+
+    const totalTaskPerTrack = scoredTasksPerTrack[learningTrack];
 
     let score = new Score(
       _.pick(req.body, ["studentId", "taskId", "score", "submissionId"])
     );
     score = await scoreService.createScore(score);
+
+    const updatedTotalScore = (student.totalScore =
+      student.totalScore + score.score);
+
+    const grade = updatedTotalScore / totalTaskPerTrack;
+
+    await userService.updateUserById(student._id, {
+      totalScore: updatedTotalScore,
+      grade,
+    });
 
     res.send(successMessage(MESSAGES.CREATED, score));
   }
@@ -75,13 +92,13 @@ class ScoreController {
     if (score) {
       res.send(successMessage(MESSAGES.FETCHED, score));
     } else {
-      res.status(404).send(errorMessage(score, "score"));
+      res.status(404).send(errorMessage("score"));
     }
   }
 
   async getScoreByStudentId(req, res) {
     const student = await userService.getUserById(req.params.studentId);
-    if (!student) return errorMessage(student, "student");
+    if (!student) return errorMessage("student");
 
     const score = await scoreService.getScoreByUserId(req.params.studentId);
 
@@ -103,20 +120,23 @@ class ScoreController {
   async updateScoreById(req, res) {
     let score = await scoreService.getScoreById(req.params.id);
 
-    if (!score) return res.status(404).send(errorMessage(score, "score"));
+    if (!score) return res.status(404).send(errorMessage("score"));
 
     score = req.body;
 
-    updatedScore = await scoreService.updateScoreById(req.params.id, score);
+    const updatedScore = await scoreService.updateScoreById(
+      req.params.id,
+      score
+    );
 
-    res.send(successMessage(MESSAGES.UPDATED, score));
+    res.send(successMessage(MESSAGES.UPDATED, updatedScore));
   }
 
   //Delete score account entirely from the database
   async deleteScore(req, res) {
     const score = await scoreService.getScoreById(req.params.id);
 
-    if (!score) return res.status(404).send(errorMessage(score, "score"));
+    if (!score) return res.status(404).send(errorMessage("score"));
 
     await scoreService.deleteScore(req.params.id);
 

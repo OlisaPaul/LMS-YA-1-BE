@@ -11,11 +11,13 @@ class AuthController {
   //Create a new user
   async logIn(req, res) {
     // checking if the user exist
+
     let userName = req.body.userName;
     if (req.body.userName && !req.body.userName.startsWith("@"))
       userName = `@${userName}`;
 
     let user = await userService.getUserByUsername(userName);
+
     if (!user) return res.status(400).send(errorMessageUserName());
 
     //checks if the password is valid

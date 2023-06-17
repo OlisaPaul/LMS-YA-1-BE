@@ -36,29 +36,17 @@ class ThumbnailController {
     if (thumbnail) {
       res.send(successMessage(MESSAGES.FETCHED, thumbnail));
     } else {
-      res.status(404).send(errorMessage(thumbnail, "thumbnail"));
+      res.status(404).send(errorMessage("thumbnail"));
     }
   }
 
   async gethThumbnailByLearningTrack(req, res) {
-    let learningTrack = req.params.learningTrack;
+    let { learningTrack } = req.params;
     if (learningTrack) learningTrack = learningTrack.toLowerCase();
 
     const thumbnail = await thumbnailService.getThumbnailsByLearningTrack(
-      req.params.learningTrack
+      learningTrack
     );
-
-    const learningTrackLists = [
-      "backend",
-      "frontend",
-      "web3",
-      "product design",
-    ];
-
-    if (!learningTrackLists.includes(learningTrack))
-      return res
-        .status(400)
-        .send({ success: false, message: "Invalid learning track" });
 
     if (thumbnail) {
       res.send(successMessage(MESSAGES.FETCHED, thumbnail));
@@ -74,8 +62,7 @@ class ThumbnailController {
   async updateThumbnailById(req, res) {
     let thumbnail = await thumbnailService.getThumbnailById(req.params.id);
 
-    if (!thumbnail)
-      return res.status(404).send(errorMessage(thumbnail, "thumbnail"));
+    if (!thumbnail) return res.status(404).send(errorMessage("thumbnail"));
 
     thumbnail = req.body;
 
@@ -91,8 +78,7 @@ class ThumbnailController {
   async deleteThumbnail(req, res) {
     const thumbnail = await thumbnailService.getThumbnailById(req.params.id);
 
-    if (!thumbnail)
-      return res.status(404).send(errorMessage(thumbnail, "thumbnail"));
+    if (!thumbnail) return res.status(404).send(errorMessage("thumbnail"));
 
     await thumbnailService.deleteThumbnail(req.params.id);
 

@@ -9,9 +9,9 @@ const scoredTasksPerTrackService = require("../services/scoredTasksPerTrack.serv
 
 const {
   errorMessage,
+  errorMessageUserName,
   successMessage,
   unAuthMessage,
-  errorMessageUserName,
 } = require("../common/messages.common");
 const generateRandomAvatar = require("../utils/generateRandomAvatar.utils");
 const scoreServices = require("../services/score.services");
@@ -50,6 +50,10 @@ class UserController {
       ])
     );
 
+    user.learningTrack = user.learningTrack.toLowerCase();
+
+    user = new User(user);
+
     const avatarUrl = await generateRandomAvatar(user.email);
     user.avatarUrl = avatarUrl;
     user.avatarImgTag = `<img src=${avatarUrl} alt=${user._id}>`;
@@ -86,12 +90,48 @@ class UserController {
 
   //get user from the database, using their email
   async gethUserById(req, res) {
-    const user = await userService.getUserById(req.params.id);
+    let [user, [scoredTasksPerTrack]] = await Promise.all([
+      userService.getUserById(req.params.id),
+      scoredTasksPerTrackService.getScoredTasksPerTrack(),
+    ]);
+
+    const learningTrack =
+      user.learningTrack === "product design"
+        ? "productDesign"
+        : user.learningTrack;
+
+    const totalTaskPerTrack = scoredTasksPerTrack[learningTrack];
+
+    const totalScore = user.totalScore;
+
+    const grade = totalScore / totalTaskPerTrack;
+
+    const userWithgrade = { ...user, grade };
+
+    const propertiesToPick = [
+      "_id",
+      "firstName",
+      "lastName",
+      "email",
+      "username",
+      "learningTrack",
+      "avatarUrl",
+      "avatarImgTag",
+      "eth",
+      "role",
+      "totalScore",
+      "grade",
+    ];
+
+    const simplifiedUser = _.pick(userWithgrade._doc, propertiesToPick);
+    simplifiedUser.grade = grade;
+
+    console.log(simplifiedUser);
 
     if (user) {
-      res.send(successMessage(MESSAGES.FETCHED, user));
+      res.send(successMessage(MESSAGES.FETCHED, simplifiedUser));
     } else {
-      res.status(404).send(errorMessage(user, "user"));
+      res.status(404).send(errorMessage("user"));
     }
   }
 
@@ -197,9 +237,10 @@ class UserController {
   }
   //get all educators in the user collection/table
   async fetchUserByLearningTrack(req, res) {
-    const users = await userService.getUsersByLearningTrack(
-      req.params.learningTrack
-    );
+    let { learningTrack } = req.params;
+    if (learningTrack) learningTrack = learningTrack.toLowerCase();
+
+    const users = await userService.getUsersByLearningTrack(learningTrack);
 
     res.send(successMessage(MESSAGES.FETCHED, users));
   }
@@ -221,13 +262,7 @@ class UserController {
   async updateUserProfile(req, res) {
     let user = await userService.getUserById(req.params.id);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
-
-    // makes sure the user can only update their account
-    if (user._id != req.user._id)
-      return res
-        .status(401)
-        .send(unAuthMessage(MESSAGES.UNAUTHORIZE("update")));
+    if (!user) return res.status(404).send(errorMessage("user"));
 
     let updatedUser = req.body;
 
@@ -245,7 +280,7 @@ class UserController {
   async deleteUserAccount(req, res) {
     const user = await userService.getUserById(req.params.id);
 
-    if (!user) return res.status(404).send(errorMessage(user, "user"));
+    if (!user) return res.status(404).send(errorMessage("user"));
 
     await userService.deleteUser(req.params.id);
 

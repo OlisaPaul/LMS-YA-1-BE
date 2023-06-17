@@ -7,6 +7,7 @@ const router = express.Router();
 const asyncMiddleware = require("../middleware/async.middleware");
 const validateObjectId = require("../middleware/validateObjectId.middleware");
 const thumbnailController = require("../controllers/thumbnail.controllers");
+const validLearningtrackMiddleware = require("../middleware/validLearningtrack.middleware");
 
 // This is used for registering a new thumbnail.
 router.post(
@@ -27,6 +28,7 @@ router.get(
 
 router.get(
   "/learningTrack/:learningTrack",
+  validLearningtrackMiddleware,
   asyncMiddleware(thumbnailController.gethThumbnailByLearningTrack)
 );
 

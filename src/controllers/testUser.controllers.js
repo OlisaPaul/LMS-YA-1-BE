@@ -3,10 +3,7 @@ const { TestUser } = require("../model/testUser.model");
 const testUserService = require("../services/testUser.services");
 const { MESSAGES } = require("../common/constants.common");
 
-const {
-  errorMessage,
-  successMessage,
-} = require("../common/messages.common");
+const { errorMessage, successMessage } = require("../common/messages.common");
 
 class TestUserController {
   async getStatus(req, res) {
@@ -31,12 +28,12 @@ class TestUserController {
         "learningTrack",
       ])
     );
-    
-   testUser.learningTrack = testUser.learningTrack.toLowerCase()
+
+    testUser.learningTrack = testUser.learningTrack.toLowerCase();
 
     // it creates a token which is sent as an header to the client
     const token = testUser.generateAuthToken();
-    
+
     testUser = await testUserService.createTestUser(testUser);
 
     testUser = _.pick(testUser, [
@@ -61,7 +58,7 @@ class TestUserController {
     if (testUser) {
       res.send(successMessage(MESSAGES.FETCHED, testUser));
     } else {
-      res.status(404).send(errorMessage(testUser, "testUser"));
+      res.status(404).send(errorMessage("testUser"));
     }
   }
 
@@ -71,7 +68,6 @@ class TestUserController {
 
     res.send(successMessage(MESSAGES.FETCHED, testUsers));
   }
-
 }
 
 module.exports = new TestUserController();

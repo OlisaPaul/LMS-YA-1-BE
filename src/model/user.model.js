@@ -117,12 +117,11 @@ function validatePatch(user) {
     lastName: Joi.string().min(4).max(255),
     password: Joi.string().min(5).max(1024),
     userName: Joi.string().min(4).max(255),
-    eth: Joi.string().min(4).max(255).required(),
+    eth: Joi.string().min(4).max(255),
     email: Joi.string().email().min(5).max(255),
     learningTrack: Joi.string()
       .min(4)
       .max(255)
-      .required()
       .valid("backend", "frontend", "product design", "web3")
       .insensitive(),
     role: Joi.string()

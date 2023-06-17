@@ -1,15 +1,15 @@
 const { MESSAGES } = require("./constants.common");
 
-const errorMessage = (data, resource, resourceId = resource) => {
+const errorMessage = (resource, resourceId = resource) => {
   return {
     message: MESSAGES.NOT_FOUND(resource, resourceId),
     success: false,
-    data,
   };
 };
 
 const errorMessageUserName = () => {
   return {
+
     message: "We can't find user with the given userName",
     success: false,
   };

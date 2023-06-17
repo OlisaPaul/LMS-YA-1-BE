@@ -8,7 +8,7 @@ const thumbnailSchema = new mongoose.Schema({
     required: true,
   },
   week: {
-    type: String,
+    type: Number,
     required: true,
   },
   img: {
@@ -26,7 +26,7 @@ const Thumbnail = mongoose.model("Thumbnail", thumbnailSchema);
 function validate(thumbnail) {
   const schema = Joi.object({
     courseTitle: Joi.string().min(4).max(255).required(),
-    week: Joi.string().min(4).max(255).required(),
+    week: Joi.number().min(1).max(52).required(),
     img: Joi.string().min(4).required(),
     learningTrack: Joi.string()
       .min(4)
