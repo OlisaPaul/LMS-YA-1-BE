@@ -1,6 +1,7 @@
 const _ = require("lodash");
+const mongoose = require("mongoose");
 require("dotenv").config();
-const Fawn = require("fawn");
+const Fawn = require("../fawn");
 const { Score } = require("../model/score.model");
 const scoreService = require("../services/score.services");
 const { MESSAGES } = require("../common/constants.common");
@@ -11,8 +12,9 @@ const courseService = require("../services/course.services");
 const scoredTasksPerTrackService = require("../services/scoredTasksPerTrack.services");
 
 const db = process.env.dbUri;
+mongoose.connect(db);
 
-Fawn.init(db);
+Fawn.init(mongoose);
 
 class ScoreController {
   async getStatus(req, res) {
@@ -84,8 +86,6 @@ class ScoreController {
 
     const updatedTotalScore = (student.totalScore =
       student.totalScore + score.score);
-
-    console.log(scoredTasksPerTrack);
 
     const grade = updatedTotalScore / totalTaskPerTrack;
 
