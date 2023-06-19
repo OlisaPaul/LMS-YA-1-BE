@@ -1,4 +1,6 @@
 const _ = require("lodash");
+require("dotenv").config();
+const Fawn = require("fawn");
 const { Score } = require("../model/score.model");
 const scoreService = require("../services/score.services");
 const { MESSAGES } = require("../common/constants.common");
@@ -7,7 +9,10 @@ const userService = require("../services/user.services");
 const taskService = require("../services/task.services");
 const courseService = require("../services/course.services");
 const scoredTasksPerTrackService = require("../services/scoredTasksPerTrack.services");
-const processScoredTask = require("../utils/processTask");
+
+const db = process.env.dbUri;
+
+Fawn.init(db);
 
 class ScoreController {
   async getStatus(req, res) {
@@ -19,9 +24,10 @@ class ScoreController {
     const { studentId, taskId } = req.body;
 
     // Checks if a student exist
-    const [[student], task] = await Promise.all([
+    const [[student], task, [scoredTasksPerTrack]] = await Promise.all([
       userService.getStudentById(studentId),
       taskService.getTaskById(taskId),
+      scoredTasksPerTrackService.getScoredTasksPerTrack(),
     ]);
 
     if (!student) return res.status(404).send(errorMessage("student"));
@@ -55,22 +61,72 @@ class ScoreController {
         ? "productDesign"
         : student.learningTrack;
 
-    const scoredTasksPerTrack = await processScoredTask(task, course);
+    //const scoredTasksPerTrack = await processScoredTask(task, course);
+
+    if (!scoredTasksPerTrack.taskIds.includes(task._id)) {
+      scoredTasksPerTrack.taskIds.push(task._id);
+
+      const learningTrack = course.learningTrack;
+
+      if (!learningTrack || !Array.isArray(learningTrack))
+        throw new Error("Invalid learning track");
+
+      // Increment scoredTasksPerTrack for each matching learning track
+      for (let track of learningTrack) {
+        if (track == "product design") track = "productDesign";
+        scoredTasksPerTrack[track]++;
+      }
+    }
 
     const totalTaskPerTrack = scoredTasksPerTrack[learningTrack];
 
     let score = new Score(_.pick(req.body, ["studentId", "taskId", "score"]));
-    score = await scoreService.createScore(score);
 
     const updatedTotalScore = (student.totalScore =
       student.totalScore + score.score);
 
+    console.log(scoredTasksPerTrack);
+
     const grade = updatedTotalScore / totalTaskPerTrack;
 
-    await userService.updateUserById(student._id, {
-      totalScore: updatedTotalScore,
-      grade,
-    });
+    const fawnTask = Fawn.Task();
+
+    // this is to make sure all the affected collections are affected as a unit,
+    // so if one fails the changes on others is rolled back
+    try {
+      // Updating scoredTasksPerTrack
+      fawnTask.update(
+        "scoredtaskspertracks",
+        { _id: scoredTasksPerTrack._id },
+        {
+          frontend: scoredTasksPerTrack.frontend,
+          backend: scoredTasksPerTrack.backend,
+          web3: scoredTasksPerTrack.web3,
+          productDesign: scoredTasksPerTrack.productDesign,
+          taskIds: scoredTasksPerTrack.taskIds,
+        }
+      );
+
+      // Creating score
+      fawnTask.save("scores", score);
+
+      // Updating user
+      fawnTask.update(
+        "users",
+        { _id: student._id },
+        {
+          totalScore: updatedTotalScore,
+          grade,
+        }
+      );
+
+      // Execute the transaction
+      await fawnTask.run();
+    } catch (error) {
+      // Handle error
+      console.error(error);
+      return res.send({ success: false, message: "Something failed" });
+    }
 
     res.send(successMessage(MESSAGES.CREATED, score));
   }
