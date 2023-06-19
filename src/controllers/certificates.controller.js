@@ -1,6 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const { Certificate } = require("../model/certificates.model");
 const certificateService = require("../services/certificates.services");
+const userService = require("../services/user.services");
 const { MESSAGES } = require("../common/constants.common");
 const { successMessage, errorMessage } = require("../common/messages.common");
 const streamifier = require("streamifier");
@@ -19,7 +20,11 @@ class CertificationController {
 
   async uploadCertificate(req, res) {
     try {
-      const { name, cohort, learningTrack } = req.body;
+      const { studentId, cohort, learningTrack } = req.body;
+
+      const student = userService.getStudentById(studentId);
+      if (!student) return res.status(404).send(errorMessage("student"));
+
       const fileBuffer = req.file.buffer;
 
       const cld_upload_stream = cloudinary.uploader.upload_stream(
@@ -37,7 +42,7 @@ class CertificationController {
 
             // Create the certificate document and save it to MongoDB
             const certificate = new Certificate({
-              name,
+              studentId,
               cohort,
               learningTrack,
               certificateUrl,

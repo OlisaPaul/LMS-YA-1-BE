@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
 require("dotenv").config();
+Joi.objectId = require("joi-objectid")(Joi);
 
 const certificateSchema = new mongoose.Schema({
   studentId: {
@@ -26,7 +27,7 @@ const Certificate = mongoose.model("Certificate", certificateSchema);
 
 function validate(certificate) {
   const schema = Joi.object({
-    name: Joi.string().min(4).max(255).required(),
+    studentId: Joi.objectId().required(),
     cohort: Joi.string().min(4).max(255).required(),
     learningTrack: Joi.string()
       .min(4)
@@ -53,7 +54,7 @@ const imageSchema = Joi.object({
 
 function validatePatch(task) {
   const schema = Joi.object({
-    name: Joi.string(),
+    studentId: Joi.objectId().required(),
     cohort: Joi.string().min(4).max(255),
     learningTrack: Joi.string()
       .min(4)
