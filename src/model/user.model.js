@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   isAdmin: Boolean,
+  title: String,
   isDeleted: Boolean,
   avatarUrl: {
     type: String,
@@ -83,6 +84,7 @@ userSchema.methods.generateAuthToken = function () {
       learningTrack: this.learningTrack,
       totalScore: this.totalScore,
       hasCertificate: this.hasCertificate,
+      title: this.title,
     },
     process.env.jwtPrivateKey
   );

@@ -11,4 +11,5 @@ module.exports = [
   "role",
   "totalScore",
   "hasCertificate",
+  "title",
 ];
