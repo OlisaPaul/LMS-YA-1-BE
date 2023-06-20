@@ -1,6 +1,4 @@
 const _ = require("lodash");
-const mongoose = require("mongoose");
-require("dotenv").config();
 const Fawn = require("../fawn");
 const { Score } = require("../model/score.model");
 const scoreService = require("../services/score.services");
@@ -10,11 +8,7 @@ const userService = require("../services/user.services");
 const taskService = require("../services/task.services");
 const courseService = require("../services/course.services");
 const scoredTasksPerTrackService = require("../services/scoredTasksPerTrack.services");
-
-const db = process.env.dbUri;
-mongoose.connect(db);
-
-Fawn.init(mongoose);
+const fawnTask = require("../utils/fawn.utils");
 
 class ScoreController {
   async getStatus(req, res) {
@@ -88,8 +82,6 @@ class ScoreController {
       student.totalScore + score.score);
 
     const grade = updatedTotalScore / totalTaskPerTrack;
-
-    const fawnTask = Fawn.Task();
 
     // this is to make sure all the affected collections are affected as a unit,
     // so if one fails the changes on others is rolled back

@@ -13,6 +13,12 @@ class CertificationService {
     });
   }
 
+  async getCertificateByUserId(studentId) {
+    return await Certificate.findOne({
+      studentId: studentId,
+    });
+  }
+
   async getAllCertificates() {
     return await Certificate.find();
   }
