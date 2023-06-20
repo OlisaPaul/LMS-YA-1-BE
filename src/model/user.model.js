@@ -64,6 +64,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  hasCertificate: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -78,6 +82,7 @@ userSchema.methods.generateAuthToken = function () {
       avatarUrl: this.avatarUrl,
       learningTrack: this.learningTrack,
       totalScore: this.totalScore,
+      hasCertificate: this.hasCertificate,
     },
     process.env.jwtPrivateKey
   );

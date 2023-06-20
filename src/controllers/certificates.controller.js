@@ -5,6 +5,7 @@ const userService = require("../services/user.services");
 const { MESSAGES } = require("../common/constants.common");
 const { successMessage, errorMessage } = require("../common/messages.common");
 const streamifier = require("streamifier");
+const task = require("../utils/fawn.utils");
 
 // Configure Cloudinary credentials
 cloudinary.config({
@@ -22,8 +23,18 @@ class CertificationController {
     try {
       const { studentId, cohort, learningTrack } = req.body;
 
-      const student = userService.getStudentById(studentId);
+      const [[student], certificate] = await Promise.all([
+        userService.getStudentById(studentId),
+        certificateService.getCertificateByUserId(studentId),
+      ]);
+
       if (!student) return res.status(404).send(errorMessage("student"));
+
+      if (certificate)
+        return res.status(400).send({
+          success: false,
+          message: "Student already has certificate.",
+        });
 
       const fileBuffer = req.file.buffer;
 
@@ -47,7 +58,27 @@ class CertificationController {
               learningTrack,
               certificateUrl,
             });
-            await certificateService.createCertificate(certificate);
+
+            try {
+              // Creating certificate
+              task.save("certificates", certificate);
+
+              // Updating user
+              task.update(
+                "users",
+                { _id: student._id },
+                {
+                  hasCertificate: true,
+                }
+              );
+
+              // Execute the transaction
+              await task.run();
+            } catch (error) {
+              // Handle error
+              console.error(error);
+              return res.send({ success: false, message: "Something failed" });
+            }
 
             res.send({ message: MESSAGES.FETCHED, certificate });
           }
@@ -57,7 +88,9 @@ class CertificationController {
       streamifier.createReadStream(fileBuffer).pipe(cld_upload_stream);
     } catch (error) {
       console.error("Error uploading certificate:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
   }
   async getAllCertificates(req, res) {
