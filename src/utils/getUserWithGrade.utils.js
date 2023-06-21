@@ -3,6 +3,8 @@ const propertiesToPick = require("../common/propertiesToPick.common");
 
 class UserWithGrade {
   getUserWithGrade(user, scoredTasksPerTrack) {
+    if (user.role != "student") return user;
+
     const learningTrack =
       user.learningTrack === "product design"
         ? "productDesign"
@@ -12,7 +14,7 @@ class UserWithGrade {
 
     const totalScore = user.totalScore;
 
-    const grade = totalScore / totalTaskPerTrack;
+    const grade = totalScore ? totalScore / totalTaskPerTrack : 0;
 
     const userWithgrade = { ...user, grade };
 
@@ -22,29 +24,13 @@ class UserWithGrade {
     return simplifiedUser;
   }
 
-  getUsersWithGrade(users, scoredTasksPerTrack) {
+  getUsersWithGrade = (users, scoredTasksPerTrack) => {
     const usersWithGrade = users.map((user) => {
-      const learningTrack =
-        user.learningTrack === "product design"
-          ? "productDesign"
-          : user.learningTrack;
-
-      const totalTaskPerTrack = scoredTasksPerTrack[learningTrack];
-
-      const totalScore = user.totalScore;
-
-      const grade = totalScore / totalTaskPerTrack;
-
-      const userWithgrade = { ...user, grade };
-
-      const simplifiedUser = _.pick(userWithgrade._doc, propertiesToPick);
-      simplifiedUser.grade = grade;
-
-      return simplifiedUser;
+      return this.getUserWithGrade(user, scoredTasksPerTrack);
     });
 
     return usersWithGrade;
-  }
+  };
 }
 
 module.exports = new UserWithGrade();

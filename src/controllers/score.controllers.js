@@ -57,8 +57,6 @@ class ScoreController {
         ? "productDesign"
         : student.learningTrack;
 
-    //const scoredTasksPerTrack = await processScoredTask(task, course);
-
     if (!scoredTasksPerTrack.taskIds.includes(task._id)) {
       scoredTasksPerTrack.taskIds.push(task._id);
 

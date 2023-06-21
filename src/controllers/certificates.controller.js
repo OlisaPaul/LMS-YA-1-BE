@@ -80,7 +80,7 @@ class CertificationController {
               return res.send({ success: false, message: "Something failed" });
             }
 
-            res.send({ message: MESSAGES.FETCHED, certificate });
+            res.send(successMessage(MESSAGES.CREATED, certificate));
           }
         }
       );
