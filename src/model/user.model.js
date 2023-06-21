@@ -65,6 +65,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  cohort: {
+    type: String,
+    default: "2022",
+  },
   hasCertificate: {
     type: Boolean,
     default: false,
@@ -85,6 +89,7 @@ userSchema.methods.generateAuthToken = function () {
       totalScore: this.totalScore,
       hasCertificate: this.hasCertificate,
       title: this.title,
+      cohort: this.cohort,
     },
     process.env.jwtPrivateKey
   );
@@ -101,6 +106,7 @@ function validate(user) {
     email: Joi.string().email().min(5).max(255).required(),
     userName: Joi.string().min(4).max(255).required(),
     eth: Joi.string().min(4).max(255).required(),
+    cohort: Joi.string().min(4).max(4),
     learningTrack: Joi.string()
       .min(4)
       .max(255)
@@ -125,6 +131,7 @@ function validatePatch(user) {
     password: Joi.string().min(5).max(1024),
     userName: Joi.string().min(4).max(255),
     eth: Joi.string().min(4).max(255),
+    cohort: Joi.string().min(4).max(4),
     email: Joi.string().email().min(5).max(255),
     learningTrack: Joi.string()
       .min(4)
