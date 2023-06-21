@@ -11,7 +11,7 @@ const {
   getUserWithGrade,
   getUsersWithGrade,
 } = require("../utils/getUserWithGrade.utils");
-
+const { transporter, mailOptions } = require("../utils/email.utils");
 const {
   errorMessage,
   errorMessageUserName,
@@ -63,6 +63,17 @@ class UserController {
     const token = user.generateAuthToken();
 
     user = _.pick(user, propertiesToPick);
+
+    transporter.sendMail(
+      mailOptions(user.email, user.firstName),
+      (error, info) => {
+        if (error) {
+          console.error("Error occurred:", error);
+        } else {
+          console.log("Email sent successfully:", info.response);
+        }
+      }
+    );
 
     res
       .header("x-auth-header", token)
