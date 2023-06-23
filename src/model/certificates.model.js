@@ -9,14 +9,6 @@ const certificateSchema = new mongoose.Schema({
     required: true,
     ref: "User",
   },
-  cohort: {
-    type: String,
-    default: 0,
-  },
-  learningTrack: {
-    type: String,
-    required: true,
-  },
   certificateUrl: {
     type: String,
     default: 0,
@@ -28,14 +20,6 @@ const Certificate = mongoose.model("Certificate", certificateSchema);
 function validate(certificate) {
   const schema = Joi.object({
     studentId: Joi.objectId().required(),
-    cohort: Joi.string().min(4).max(255).required(),
-    learningTrack: Joi.string()
-      .min(4)
-      .max(255)
-      .required()
-      .valid("backend", "frontend", "product design", "web3")
-      .insensitive()
-      .required(),
   });
 
   return schema.validate(certificate);
@@ -55,13 +39,6 @@ const imageSchema = Joi.object({
 function validatePatch(task) {
   const schema = Joi.object({
     studentId: Joi.objectId().required(),
-    cohort: Joi.string().min(4).max(255),
-    learningTrack: Joi.string()
-      .min(4)
-      .max(255)
-      .required()
-      .valid("backend", "frontend", "product design", "web3")
-      .insensitive(),
   });
 
   return schema.validate(task);

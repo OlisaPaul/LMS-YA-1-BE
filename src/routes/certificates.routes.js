@@ -29,6 +29,12 @@ router.get(
   asyncMiddleware(certificatesController.getCertificateById)
 );
 
+router.get(
+  "/user/:id",
+  validateObjectId,
+  asyncMiddleware(certificatesController.getCertificateByUserId)
+);
+
 router.delete(
   "/:id",
   validateObjectId,

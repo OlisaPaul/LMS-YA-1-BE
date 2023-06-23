@@ -21,7 +21,7 @@ class CertificationController {
 
   async uploadCertificate(req, res) {
     try {
-      const { studentId, cohort, learningTrack } = req.body;
+      const { studentId } = req.body;
 
       const [[student], certificate] = await Promise.all([
         userService.getStudentById(studentId),
@@ -54,8 +54,6 @@ class CertificationController {
             // Create the certificate document and save it to MongoDB
             const certificate = new Certificate({
               studentId,
-              cohort,
-              learningTrack,
               certificateUrl,
             });
 
@@ -96,20 +94,23 @@ class CertificationController {
   async getAllCertificates(req, res) {
     const certificates = await certificateService.getAllCertificates();
 
-    // Add the Cloudinary URL to each certificate object
-    const certificatesWithUrls = certificates.map((certificate) => {
-      return {
-        _id: certificate._id,
-        cohort: certificate.cohort,
-        certificateUrl: certificate.certificateUrl,
-      };
-    });
+    res.send(successMessage(MESSAGES.FETCHED, certificates));
+  }
 
-    res.send(successMessage(MESSAGES.FETCHED, certificatesWithUrls));
+  async getCertificateByUserId(req, res) {
+    const certificate = await certificateService.getCertificateByUserId(
+      req.params.id
+    );
+
+    if (certificate) {
+      res.send(successMessage(MESSAGES.FETCHED, certificate));
+    } else {
+      res.status(404).send(errorMessage(video, "certificate"));
+    }
   }
 
   async getCertificateById(req, res) {
-    const certificate = await certificateService.getCertificatesById(
+    const certificate = await certificateService.getCertificateById(
       req.params.id
     );
 
