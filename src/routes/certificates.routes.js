@@ -12,14 +12,15 @@ const validateFileMiddleware = require("../middleware/validateFile.middleware");
 const validateObjectId = require("../middleware/validateObjectId.middleware");
 
 const router = express.Router();
+const fieldName = "image";
 const fileSize = 5;
-const upload = multer(multerCommon(multer, fileSize)).single("image");
+const upload = multer(multerCommon(multer, fileSize)).single(fieldName);
 
 router.post(
   "/",
   auth,
   admin,
-  multerErrorMiddleware(upload, multer, fileSize, "image"),
+  multerErrorMiddleware(upload, multer, fileSize, fieldName),
   validateMiddleware(validate),
   validateFileMiddleware("Image", imageSchema),
   asyncMiddleware(certificatesController.uploadCertificate)

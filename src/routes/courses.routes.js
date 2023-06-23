@@ -19,14 +19,15 @@ const multerCommon = require("../common/multer.common");
 
 const router = express.Router();
 const fileSize = 50;
-const upload = multer(multerCommon(multer, fileSize)).single("video");
+const fieldName = "image";
+const upload = multer(multerCommon(multer, fileSize)).single(fieldName);
 
 // This is used for registering a new course.
 router.post(
   "/",
   auth,
   admin,
-  multerErrorMiddleware(upload, multer, fileSize, "video"),
+  multerErrorMiddleware(upload, multer, fileSize, fieldName),
   validateMiddleware(validate),
   validateFileMiddleware("Video", videoTypeValidator),
   asyncMiddleware(courseController.uploadCourse)

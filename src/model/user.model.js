@@ -59,7 +59,7 @@ const userSchema = new mongoose.Schema({
   },
   eth: {
     type: String,
-    required: true,
+    default: "0x0000000000000000000000000000000000000000",
   },
   totalScore: {
     type: Number,
@@ -105,7 +105,7 @@ function validate(user) {
     password: Joi.string().min(5).max(1024).required(),
     email: Joi.string().email().min(5).max(255).required(),
     userName: Joi.string().min(4).max(255).required(),
-    eth: Joi.string().min(4).max(255).required(),
+    eth: Joi.string().min(4).max(255),
     cohort: Joi.string().min(4).max(4),
     learningTrack: Joi.string()
       .min(4)
