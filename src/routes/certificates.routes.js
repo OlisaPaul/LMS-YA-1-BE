@@ -1,24 +1,29 @@
+const multer = require("multer");
 const express = require("express");
-const router = express.Router();
 const admin = require("../middleware/admin.middleware");
 const auth = require("../middleware/auth.middleware");
-const certificatesController = require("../controllers/certificates.controller");
 const asyncMiddleware = require("../middleware/async.middleware");
-const validateMiddleware = require("../middleware/validate.middleware");
+const certificatesController = require("../controllers/certificates.controller");
+const multerCommon = require("../common/multer.common");
+const multerErrorMiddleware = require("../middleware/multerError.middleware");
 const { validate, imageSchema } = require("../model/certificates.model");
-const validateObjectId = require("../middleware/validateObjectId.middleware");
-const multer = require("multer");
+const validateMiddleware = require("../middleware/validate.middleware");
 const validateFileMiddleware = require("../middleware/validateFile.middleware");
-const upload = multer({ storage: multer.memoryStorage() });
+const validateObjectId = require("../middleware/validateObjectId.middleware");
+
+const router = express.Router();
+const fieldName = "image";
+const fileSize = 5;
+const upload = multer(multerCommon(multer, fileSize)).single(fieldName);
 
 router.post(
   "/",
-  upload.single("image"),
   auth,
   admin,
+  multerErrorMiddleware(upload, multer, fileSize, fieldName),
   validateMiddleware(validate),
   validateFileMiddleware("Image", imageSchema),
-  certificatesController.uploadCertificate
+  asyncMiddleware(certificatesController.uploadCertificate)
 );
 
 router.get("/", asyncMiddleware(certificatesController.getAllCertificates));
