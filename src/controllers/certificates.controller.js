@@ -105,7 +105,7 @@ class CertificationController {
     if (certificate) {
       res.send(successMessage(MESSAGES.FETCHED, certificate));
     } else {
-      res.status(404).send(errorMessage(video, "certificate"));
+      res.status(404).send(errorMessage("certificate"));
     }
   }
 
@@ -117,7 +117,7 @@ class CertificationController {
     if (certificate) {
       res.send(successMessage(MESSAGES.FETCHED, certificate));
     } else {
-      res.status(404).send(errorMessage(video, "certificate"));
+      res.status(404).send(errorMessage("certificate"));
     }
   }
 
