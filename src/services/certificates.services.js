@@ -10,17 +10,17 @@ class CertificationService {
     return await Certificate.findOne({
       _id: certificateId,
       isDeleted: undefined,
-    });
+    }).populate("studentId");
   }
 
   async getCertificateByUserId(studentId) {
     return await Certificate.findOne({
       studentId: studentId,
-    });
+    }).populate("studentId");
   }
 
   async getAllCertificates() {
-    return await Certificate.find();
+    return await Certificate.find().populate("studentId");
   }
 
   async updateCertificateById(id, certificate) {
