@@ -1,12 +1,64 @@
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
 const _ = require("lodash");
 const { Thumbnail } = require("../model/thumbnail.model");
 const thumbnailService = require("../services/thumbnail.services");
 const { MESSAGES } = require("../common/constants.common");
 const { errorMessage, successMessage } = require("../common/messages.common");
 
+// Configure Cloudinary credentials
+cloudinary.config({
+  cloud_name: "dumzlw4bf",
+  api_key: "369185629596499",
+  api_secret: "_9gHrTNy7eYHENzp5Tj45Zpoer8",
+});
+
 class ThumbnailController {
   async getStatus(req, res) {
     res.status(200).send({ message: MESSAGES.DEFAULT, success: true });
+  }
+
+  async uploadThumbnail(req, res) {
+    try {
+      const { courseTitle, learningTrack, week } = req.body;
+
+      const fileBuffer = req.file.buffer;
+
+      const cld_upload_stream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: "image",
+          folder: "foo",
+        },
+
+        async function (error, result) {
+          if (error) {
+            console.error("Error uploading thumbnail:", error);
+            res.status(500).json({ error: "Internal Server Error" });
+          } else {
+            const thumbnailUrl = result.secure_url;
+
+            // Create the thumbnail document and save it to MongoDB
+            let thumbnail = new Thumbnail({
+              courseTitle,
+              learningTrack,
+              week,
+              thumbnailUrl,
+            });
+
+            thumbnail = await thumbnailService.createThumbnail(thumbnail);
+
+            res.send(successMessage(MESSAGES.CREATED, thumbnail));
+          }
+        }
+      );
+
+      streamifier.createReadStream(fileBuffer).pipe(cld_upload_stream);
+    } catch (error) {
+      console.error("Error uploading thumbnail:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
+    }
   }
 
   //Create a new thumbnail
