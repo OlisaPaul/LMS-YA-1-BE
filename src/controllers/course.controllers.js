@@ -37,11 +37,13 @@ class CourseController {
           } else {
             const videoUrl = result.secure_url;
 
+            const learningTrackToArray = learningTrack.toLowerCase().split(",");
+
             // Create the video document and save it to MongoDB
             const course = new Course({
               courseTitle,
               description,
-              learningTrack,
+              learningTrack: learningTrackToArray,
               week,
               videoUrl,
             });

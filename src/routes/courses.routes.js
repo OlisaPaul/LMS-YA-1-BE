@@ -19,7 +19,7 @@ const multerCommon = require("../common/multer.common");
 
 const router = express.Router();
 const fileSize = 50;
-const fieldName = "image";
+const fieldName = "video";
 const upload = multer(multerCommon(multer, fileSize)).single(fieldName);
 
 // This is used for registering a new course.
