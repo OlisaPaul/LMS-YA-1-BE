@@ -32,14 +32,12 @@ function validate(course) {
     courseTitle: Joi.string().min(4).max(255).required(),
     description: Joi.string().min(4).max(255).required(),
     week: Joi.number().min(1).max(52).required(),
-    learningTrack: Joi.array()
-      .items(
-        Joi.string()
-          .valid("backend", "frontend", "product design", "web3")
-          .insensitive()
-      )
-      .min(1)
-      .required(),
+    learningTrack: Joi.string()
+      .min(4)
+      .max(255)
+      .required()
+      .valid("backend", "frontend", "product design", "web3")
+      .insensitive(),
   });
 
   return schema.validate(course);
