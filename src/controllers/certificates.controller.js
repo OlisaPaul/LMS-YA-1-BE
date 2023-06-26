@@ -122,14 +122,20 @@ class CertificationController {
   }
 
   async deleteCertificate(req, res) {
+    const { id: certificateId } = req.params;
+
     const certificate = await certificateService.getCertificateById(
-      req.params.id
+      certificateId
     );
 
-    if (!certificate)
-      return res.status(404).send(errorMessage(certificate, "certificate"));
+    if (!certificate) return res.status(404).send(errorMessage("certificate"));
 
-    await certificateService.deleteCertificate(req.params.id);
+    const student = await userService.getStudentById(certificate.studentId);
+
+    await Promise.all([
+      certificateService.deleteCertificate(certificateId),
+      userService.updateUserById(student[0]._id, { hasCertificate: false }),
+    ]);
 
     res.send(successMessage(MESSAGES.DELETED, certificate));
   }
